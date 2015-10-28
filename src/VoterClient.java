@@ -127,6 +127,7 @@ public class VoterClient extends JFrame implements ActionListener{
 			System.out.println("Klienten skickar sitt personnummer till CLA");
 			socketOut.println(ssn);
 			System.out.println("Sending " + textFieldValue + " to server");
+			System.out.println( "Received validation number " + socketIn.readLine() + " from the server");
 //			String file_download = "a.txt";
 //			String file_upload = "new.txt";
 //			String file_delete = "delete.txt";

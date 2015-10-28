@@ -53,6 +53,9 @@ public class CLAServer {
 		voterPublicKeys.put("123", new VoterPublicKey(new BigInteger("17"), new BigInteger("551"), "123"));
 		voterPublicKeys.put("456", new VoterPublicKey(new BigInteger("7"), new BigInteger("253"), "456"));
 		voterPublicKeys.put("789", new VoterPublicKey(new BigInteger("5"), new BigInteger("119"), "789"));
+		
+		// Set up validation keys
+		voterValidationNumbers = new HashMap<String, String>();
 	}
 	
 	/**
@@ -90,8 +93,6 @@ public class CLAServer {
 			
 			// ===== Secure election ===== //
 			
-			voterPublicKeys = new HashMap<String, VoterPublicKey>();
-			
 			String ssn = in.readLine();
 			System.out.println("Server read " + ssn + " from client");
 			String validationNumber = "";
@@ -112,6 +113,7 @@ public class CLAServer {
 				
 				// Print the validation number back to the voter client
 				out.println(validationNumber);
+				System.out.println("Sending " + validationNumber + " to the client");
 				
 			} else {
 				// Not a valid ssn
@@ -131,7 +133,7 @@ public class CLAServer {
 	 */
 	private String generateValidationNumber()
 	{
-		int randomInt = (int) Math.round( Math.random() ) * 20000;
+		int randomInt = (int) Math.round( Math.random() * 20000);
 		return Integer.toString(randomInt);
 	}
 
