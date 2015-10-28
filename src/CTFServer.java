@@ -5,7 +5,7 @@ import javax.net.ssl.*;
 import java.security.*;
 import java.util.HashMap;
 
-public class CLAServer {
+public class CTFServer {
 	private int port;
 	// This is not a reserved port number
 	static final int DEFAULT_PORT = 8189;
@@ -14,48 +14,13 @@ public class CLAServer {
 	static final String trustSTOREPASSWD = "abcdef";
 	static final String keySTOREPASSWD = "123456";
 	static final String ALIASPASSWD = keySTOREPASSWD;
-	
-	// Inner class VoterPublicKey
-	public class VoterPublicKey {
-		private String ssn;
-		private BigInteger e, n;
-		
-		VoterPublicKey( BigInteger e, BigInteger n, String ssn){
-			this.ssn = ssn;
-			this.n = n;
-			this.e = e;
-		}
-
-		public BigInteger getE(){
-			return this.e;
-		}
-		public BigInteger getN(){
-			return this.n;
-		}
-		public String getSSN(){
-			return this.ssn;
-		}
-	}
-	
-	// Hash map containing valid voter social security numbers and their corresponding public keys
-	HashMap<String, VoterPublicKey> voterPublicKeys;	// <ssn, voterPublicKey>
-	HashMap<String, String> voterValidationCodes;		// <ssn, validationCode>
 
 	/** Constructor
 	 * @param port The port where the server will listen for requests
 	 */
-	CLAServer( int port )
+	CTFServer( int port )
 	{
 		this.port = port;
-		
-		// Set up valid voters
-		voterPublicKeys = new HashMap<String, VoterPublicKey>();
-		voterPublicKeys.put("123", new VoterPublicKey(new BigInteger("17"), new BigInteger("551"), "123"));
-		voterPublicKeys.put("456", new VoterPublicKey(new BigInteger("7"), new BigInteger("253"), "456"));
-		voterPublicKeys.put("789", new VoterPublicKey(new BigInteger("5"), new BigInteger("119"), "789"));
-		
-		// Set up validation keys
-		voterValidationCodes = new HashMap<String, String>();
 	}
 	
 	/**
@@ -94,32 +59,8 @@ public class CLAServer {
 			// ===== Secure election ===== //
 			
 			String ssn = in.readLine();
-			System.out.println("Server read " + ssn + " from client");
-			String validationCode = "";
 			
-			// Check if the ssn is valid
-			if(voterPublicKeys.containsKey(ssn))
-			{
-				// check if a validation number already has been created for this ssn
-				if(voterValidationCodes.containsKey(ssn))
-				{
-					// get the value of key 'ssn'
-					validationCode = voterValidationCodes.get(ssn);
-				} else {
-					// create a random validationCode
-					validationCode = generatevalidationCode();
-					voterValidationCodes.put(ssn, validationCode);
-				}
-				
-				// Print the validation number back to the voter client
-				out.println(validationCode);
-				System.out.println("Sending " + validationCode + " to the client");
-				
-			} else {
-				// Not a valid ssn
-				System.out.println(ssn + " is not a valid ssn!");
-				out.println(ssn + " is not a valid ssn!");
-			}
+			// do stuff here
 
 			incoming.close();
 		}
@@ -129,14 +70,6 @@ public class CLAServer {
 		}
 	}
 	
-	/*
-	 * Generate a random validation number.
-	 */
-	private String generatevalidationCode()
-	{
-		int randomInt = (int) Math.round( Math.random() * 20000);
-		return Integer.toString(randomInt);
-	}
 
 	/** main method of class
 	 * @param args[0] Optional port number in place of
@@ -147,8 +80,8 @@ public class CLAServer {
 		if (args.length > 0 ) {
 			port = Integer.parseInt( args[0] );
 		}
-		CLAServer CLAServer = new CLAServer( port );
-		CLAServer.run();
+		CTFServer CTFServer = new CTFServer( port );
+		CTFServer.run();
 	}
 }
 
