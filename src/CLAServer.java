@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class CLAServer {
 	private int port;
 	// This is not a reserved port number
-	static final int DEFAULT_PORT = 8189;
+	static final int DEFAULT_PORT = 8188;
 	static final String KEYSTORE = "LIUkeystore.ks";
 	static final String TRUSTSTORE = "LIUtruststore.ks";
 	static final String trustSTOREPASSWD = "abcdef";
@@ -94,7 +94,7 @@ public class CLAServer {
 			// ===== Secure election ===== //
 			
 			String ssn = in.readLine();
-			System.out.println("Server read " + ssn + " from client");
+			System.out.println("Server received SSN " + ssn + " from client");
 			String validationCode = "";
 			
 			// Check if the ssn is valid
@@ -113,7 +113,7 @@ public class CLAServer {
 				
 				// Print the validation number back to the voter client
 				out.println(validationCode);
-				System.out.println("Sending " + validationCode + " to the client");
+				System.out.println("Sending validation code " + validationCode + " to the client");
 				
 			} else {
 				// Not a valid ssn

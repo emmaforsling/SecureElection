@@ -17,7 +17,8 @@ public class VoterClient extends JFrame implements ActionListener{
 	private InetAddress host;
 	private int port;
 	// This is not a reserved port number 
-	static final int DEFAULT_PORT = 8189;
+	static final int DEFAULT_CLA_PORT = 8188;
+	static final int DEFAULT_CTF_PORT = 8189;
 	static final String KEYSTORE = "PIERkeystore.ks";
 	static final String TRUSTSTORE = "PIERtruststore.ks";
 	static final String keySTOREPASSWD = "111111";
@@ -97,7 +98,7 @@ public class VoterClient extends JFrame implements ActionListener{
 	
 /** =========================================== RUN ========================================= **/
   // The method used to start a client object
-	public void run(String ssn) {
+	public void runCLA(String ssn) {
 		String validationCode = ""; 
 		try {
 			KeyStore ks = KeyStore.getInstance( "JCEKS" );
@@ -130,7 +131,6 @@ public class VoterClient extends JFrame implements ActionListener{
 			socketOut.println(ssn);
 			System.out.println("Sending " + textFieldValue + " to server");
 			
-			
 			validationCode = socketIn.readLine();
 			System.out.println( "Received validation number " + validationCode + " from the server");
 			if(!validationCode.equals("")){
@@ -145,30 +145,57 @@ public class VoterClient extends JFrame implements ActionListener{
 			x.printStackTrace();
 		}
 	}
+	
+	public void runCTF(String valCode)
+	{
+		try
+		{
+			KeyStore ks = KeyStore.getInstance( "JCEKS" );
+			ks.load( new FileInputStream( KEYSTORE ), keySTOREPASSWD.toCharArray() );
+			
+			KeyStore ts = KeyStore.getInstance( "JCEKS" );
+			ts.load( new FileInputStream( TRUSTSTORE ), trustSTOREPASSWD.toCharArray() );
+			
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance( "SunX509" );
+			kmf.init( ks, ALIASPASSWD.toCharArray() );
+			
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
+			tmf.init( ts );
+			
+			SSLContext sslContext = SSLContext.getInstance( "TLS" );
+			sslContext.init( kmf.getKeyManagers(), tmf.getTrustManagers(), null );
+			SSLSocketFactory sslFact = sslContext.getSocketFactory();      	
+			SSLSocket client =  (SSLSocket)sslFact.createSocket(host, port);
+			client.setEnabledCipherSuites( client.getSupportedCipherSuites() );
+			
+			System.out.println("\n>>>> SSL/TLS handshake completed");
+			
+			BufferedReader socketIn;
+			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
+			PrintWriter socketOut = new PrintWriter( client.getOutputStream(), true );
+			
+			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+
+			System.out.println("Klienten skickar sitt personnummer till CLA");
+			socketOut.println(valCode);
+			System.out.println("Sending " + textFieldValue + " to server");
+			
+			// Stop loop on server
+			socketOut.println ( "" );
+		}
+		catch( Exception x ) {
+			System.out.println( x );
+			x.printStackTrace();
+		}
+	}
 /** ======================================================================================== **/	
 	
 /** ======================================== MAIN ========================================== **/	
 	// The test method for the class @param args Optional port number and host name
-	public static void main( String[] args ) {
+	public static void main( String[] args )
+	{
 		
 		VoterClient noClient = new VoterClient();
-		
-		try {
-			InetAddress host = InetAddress.getLocalHost();
-			int port = DEFAULT_PORT;
-			if ( args.length > 0 ) {
-				port = Integer.parseInt( args[0] );
-			}
-			if ( args.length > 1 ) {
-				host = InetAddress.getByName( args[1] );
-			}
-			voterClient = new VoterClient( host, port );
-			//voterClient.run();
-		}
-		catch ( UnknownHostException uhx ) {
-			System.out.println( uhx );
-			uhx.printStackTrace();
-		}
 	}
 /** ========================================================================================= **/
 	
@@ -200,9 +227,20 @@ public class VoterClient extends JFrame implements ActionListener{
 			removeCLAFrame();
 			addMainFrameComponents();
 			
-			voterClient.run(textFieldValue);
+			// CLA host
+			try {
+				InetAddress CLAHost = InetAddress.getLocalHost();
+				int CLAPort = DEFAULT_CLA_PORT;
+				
+				voterClient = new VoterClient( CLAHost, CLAPort );
+				voterClient.runCLA(textFieldValue);
+			}
+			catch ( UnknownHostException uhx ) {
+				System.out.println( uhx );
+				uhx.printStackTrace();
+			}
 			
-			
+			//voterClient.run(textFieldValue);
 		}
 		else if(e.getSource() == btnReturn2) {
 			System.out.println("========== Return Button CTF is pressed =======");
@@ -210,6 +248,19 @@ public class VoterClient extends JFrame implements ActionListener{
 			System.out.println("Kod = " + textFieldValue2);
 			removeCTFFrame();
 			addMainFrameComponents();
+			
+			// CTF host
+			try {
+				InetAddress CTFHost = InetAddress.getLocalHost();
+				int CTFPort = DEFAULT_CTF_PORT;
+				voterClient = new VoterClient( CTFHost, CTFPort );
+				voterClient.runCTF(textFieldValue2);
+			}
+			catch ( UnknownHostException uhx ) {
+				System.out.println( uhx );
+				uhx.printStackTrace();
+			}
+			
 		} else {
 			
 		}

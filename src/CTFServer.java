@@ -50,7 +50,7 @@ public class CTFServer {
 			// Client authentication
 			sss.setNeedClientAuth(true);
 			
-			System.out.println("\n>>>> CLA Server: active ");
+			System.out.println("\n>>>> CTF Server: active ");
 			SSLSocket incoming = (SSLSocket)sss.accept();
 
 			BufferedReader in = new BufferedReader( new InputStreamReader( incoming.getInputStream() ) );
@@ -58,9 +58,10 @@ public class CTFServer {
 			
 			// ===== Secure election ===== //
 			
-			String ssn = in.readLine();
+			String valCode = in.readLine();
 			
 			// do stuff here
+			System.out.println("Received validation code " + valCode + " from the client");
 
 			incoming.close();
 		}
@@ -69,7 +70,6 @@ public class CTFServer {
 			x.printStackTrace();
 		}
 	}
-	
 
 	/** main method of class
 	 * @param args[0] Optional port number in place of
