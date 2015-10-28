@@ -9,6 +9,7 @@ import java.security.KeyStore;
 import javax.net.ssl.*;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
@@ -23,21 +24,23 @@ public class VoterClient extends JFrame implements ActionListener{
 	static final String trustSTOREPASSWD = "7777777";
 	static final String ALIASPASSWD = keySTOREPASSWD;
 	
-	/* */ 
-	static private JFrame mainFrame;
-	static private JButton btnCLA;			// to activate the CLA screen
-	static private JButton btnCTF;			// to activate the CTF screen
-	static private JButton btnQuit;			// to quit the main screen
-	static private JButton btnReturn1;		// to return to the main screen
-	static private JButton btnReturn2;		// to return to the main screen
-	static private JTextField txtFieldCLA;	// to write the social security number in
-	static private JTextField txtFieldCTF;	// to write the code in
+	/* JFrame components */ 
+	static private JFrame mainFrame;					
+	static private JButton btnCLA;						// to activate the CLA screen
+	static private JButton btnCTF;						// to activate the CTF screen
+	static private JButton btnQuit;						// to quit the main screen
+	static private JButton btnReturn1;					// to return to the main screen
+	static private JButton btnReturn2;					// to return to the main screen
+	static private JTextField txtFieldCLA;				// to write the social security number in
+	static private JTextField txtFieldCTF;				// to write the code in
+	static private JTextField txtFieldDisplayCode; 		// displays the code
 	/* */
 	/**
 	 * 
 	 * @param host
 	 * @param port
 	 */
+	static VoterClient voterClient;
 
 /** =============================== CONSTRUCTORS ============================================**/
 	/**
@@ -63,6 +66,7 @@ public class VoterClient extends JFrame implements ActionListener{
 		btnCLA = new JButton("Få ditt röstkort - CLA");
 		btnCTF = new JButton("Rösta - CTF");
 		btnQuit = new JButton("Exit");
+		txtFieldDisplayCode = new JTextField();
 		
 		//2. Optional: What happens when the frame closes?
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -71,6 +75,7 @@ public class VoterClient extends JFrame implements ActionListener{
 		mainFrame.setLayout(new FlowLayout());
 		
 		// Add components
+		mainFrame.add(txtFieldDisplayCode);
 		mainFrame.add(btnCLA);
 		mainFrame.add(btnCTF);
 		mainFrame.add(btnQuit);
@@ -182,8 +187,8 @@ public class VoterClient extends JFrame implements ActionListener{
 			if ( args.length > 1 ) {
 				host = InetAddress.getByName( args[1] );
 			}
-			VoterClient addClient = new VoterClient( host, port );
-			addClient.run();
+			voterClient = new VoterClient( host, port );
+			//voterClient.run();
 		}
 		catch ( UnknownHostException uhx ) {
 			System.out.println( uhx );
@@ -201,21 +206,30 @@ public class VoterClient extends JFrame implements ActionListener{
 			System.out.println("========== CLA Button is pressed ========== "); 
 			removeMainFrameButtons();		// Remove btnCLA and btnCTF from mainFrame
 			addTextFieldToMainFrameCLA();		// Insert a textField in mainFrame
-		} else if(e.getSource() == btnCTF){
+			voterClient.run();
+		} 
+		else if(e.getSource() == btnCTF){
 			System.out.println("========== CTF Button is pressed ========== ");
 			removeMainFrameButtons();		// Remove btnCLA and btnCTF from mainFrame
 			addTextFieldToMainFrameCTF();
 			
-		} else if(e.getSource() == btnQuit) {
+		}
+		else if(e.getSource() == btnQuit) {
 			System.out.println("========= Quit Button is pressed ==========");
 			System.exit(0);
 			
-		} else if(e.getSource() == btnReturn1){
+		}
+		else if(e.getSource() == btnReturn1){
 			System.out.println("========== Return Button CLA is pressed =======");
+			String textFieldValue = txtFieldCLA.getText();
+			System.out.println("Personnummer = " + textFieldValue);
 			removeCLAFrame();
 			addMainFrameComponents();
-		} else if(e.getSource() == btnReturn2) {
+		}
+		else if(e.getSource() == btnReturn2) {
 			System.out.println("========== Return Button CTF is pressed =======");
+			String textFieldValue = txtFieldCTF.getText();
+			System.out.println("Kod = " + textFieldValue);
 			removeCTFFrame();
 			addMainFrameComponents();
 		} else {
@@ -229,6 +243,7 @@ public class VoterClient extends JFrame implements ActionListener{
 /** ========================================================================================= **/	
 	
 /** ========================== Functions called by actionPerformed ========================== **/
+	
 	
 	private void removeCLAFrame() {
 		btnReturn1.setVisible(false);
@@ -269,7 +284,7 @@ public class VoterClient extends JFrame implements ActionListener{
 		txtFieldCLA.setToolTipText("Ange personnummer");
 		
 		// Creating a temporary return button
-		btnReturn1 = new JButton("Tillbaka");
+		btnReturn1 = new JButton("Ok");
 		
 		// Add action listener to the return button
 		btnReturn1.addActionListener(this);
@@ -290,7 +305,7 @@ public class VoterClient extends JFrame implements ActionListener{
 		txtFieldCTF.setToolTipText("Ange kod");
 		
 		// Creating a temporary return button
-		btnReturn2 = new JButton("Tillbaka");
+		btnReturn2 = new JButton("Ok");
 		
 		// Add action listener to the return button
 		btnReturn2.addActionListener(this);
