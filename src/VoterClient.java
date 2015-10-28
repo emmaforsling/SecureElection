@@ -129,42 +129,7 @@ public class VoterClient extends JFrame implements ActionListener{
 			System.out.println("Sending " + textFieldValue + " to server");
 //			String file_download = "a.txt";
 //			String file_upload = "new.txt";
-//			String file_delete = "delete.txt";
-//			String filecontents = "emma pemma heter jag o jag är så god o glad.";
-//			
-//			// Download
-//			System.out.println("\n=== Downloading ===");
-//			socketOut.println("download");
-//			socketOut.println(file_download);
-//			// Print response from server
-//			System.out.println( socketIn.readLine() );
-//				
-//			// Upload
-//			System.out.println("\n=== Uploading ===");
-//			socketOut.println("upload");
-//			socketOut.println(file_upload);
-//			socketOut.println(filecontents.length());
-//			socketOut.println(filecontents);
-//			// Print response from server
-//			System.out.println( socketIn.readLine() );
-//			
-//			// Delete
-//			System.out.println("\n=== Deleting ===");
-//			socketOut.println("delete");
-//			socketOut.println(file_delete);
-//			// Print response from server
-//			System.out.println( socketIn.readLine() );
-			
-			/*
-			String s;
-			s = bufferRead.readLine();
-			while(s != null && s.length() != 0)
-			{
-				System.out.println( ">>>> Sending " + s + " to SecureAdditionServer" );
-				socketOut.println( s );
-				s = bufferRead.readLine();
-			}
-			*/
+
 		    
 			// Stop loop on server
 			socketOut.println ( "" );
