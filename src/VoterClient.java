@@ -9,6 +9,8 @@ import java.security.KeyStore;
 import javax.net.ssl.*;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 public class VoterClient extends JFrame implements ActionListener{
 	private InetAddress host;
@@ -21,13 +23,71 @@ public class VoterClient extends JFrame implements ActionListener{
 	static final String trustSTOREPASSWD = "7777777";
 	static final String ALIASPASSWD = keySTOREPASSWD;
 	
+	/* */ 
+	static private JFrame mainFrame;
+	static private JButton btnCLA;			// to activate the CLA screen
+	static private JButton btnCTF;			// to activate the CTF screen
+	static private JButton btnQuit;			// to quit the main screen
+	static private JButton btnReturn1;		// to return to the main screen
+	static private JButton btnReturn2;		// to return to the main screen
+	static private JTextField txtFieldCLA;	// to write the social security number in
+	static private JTextField txtFieldCTF;	// to write the code in
+	/* */
+	/**
+	 * 
+	 * @param host
+	 * @param port
+	 */
+
+/** =============================== CONSTRUCTORS ============================================**/
+	/**
+	 * Default constructor, used to initiate the JFrame
+	 */
+	public VoterClient(){
+		// Initialize mainFrame, consisting of two buttons, btnCLA and btnCTF
+		initJFrame();
+		
+	}
+
 	// Constructor @param host Internet address of the host where the server is located
 	// @param port Port number on the host where the server is listening
 	public VoterClient( InetAddress host, int port ) {
 		this.host = host;
 		this.port = port;
 	}
+/** ========================================================================================= **/
+
+/** =========================== Initialize JFrame components ================================ **/
+	private void initJFrame() {
+		mainFrame = new JFrame("FrameDemo");
+		btnCLA = new JButton("Få ditt röstkort - CLA");
+		btnCTF = new JButton("Rösta - CTF");
+		btnQuit = new JButton("Exit");
+		
+		//2. Optional: What happens when the frame closes?
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		//3. Create components and put them in the frame.
+		mainFrame.setLayout(new FlowLayout());
+		
+		// Add components
+		mainFrame.add(btnCLA);
+		mainFrame.add(btnCTF);
+		mainFrame.add(btnQuit);
+		
+		btnCLA.addActionListener(this);
+		btnCTF.addActionListener(this);
+		btnQuit.addActionListener(this);
+		
+		//4. Size the frame.
+		mainFrame.pack();
+
+		//5. Show it.
+		mainFrame.setVisible(true);	
+	}
+/** ========================================================================================= **/
 	
+/** =========================================== RUN ========================================= **/
   // The method used to start a client object
 	public void run() {
 		try {
@@ -105,11 +165,13 @@ public class VoterClient extends JFrame implements ActionListener{
 			x.printStackTrace();
 		}
 	}
+/** ======================================================================================== **/	
 	
-	
+/** ======================================== MAIN ========================================== **/	
 	// The test method for the class @param args Optional port number and host name
 	public static void main( String[] args ) {
-		initJFrame();
+		
+		VoterClient noClient = new VoterClient();
 		
 		try {
 			InetAddress host = InetAddress.getLocalHost();
@@ -128,48 +190,117 @@ public class VoterClient extends JFrame implements ActionListener{
 			uhx.printStackTrace();
 		}
 	}
-
-	private static void initJFrame() {
-		//1. Create the frame.
-		JFrame frame = new JFrame("FrameDemo");
-		JButton btnCLA = new JButton("Få ditt röstkort - CLA");
-		JButton btnCTF = new JButton("Rösta - CTF");
-		
-		//2. Optional: What happens when the frame closes?
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		//3. Create components and put them in the frame.
-		//...create emptyLabel...
-		//frame.getContentPane().add(emptyLabel, BorderLayout.CENTER);
-		frame.setLayout(new FlowLayout());
-		
-		// Add components
-		frame.add(btnCLA);
-		frame.add(btnCTF);
-		
-		btnCLA.addActionListener(new ActionListener() { 
-			public void actionPerformed(ActionEvent e) { 
-				System.out.println("========== CLA Button is pressed ========== ");			  
-			} 
-		} );
-		
-		btnCTF.addActionListener(new ActionListener() { 
-			public void actionPerformed(ActionEvent e) { 
-				System.out.println("========== CTF Button is pressed ========== ");			  
-			} 
-		} );
-		
-		//4. Size the frame.
-		frame.pack();
-
-		//5. Show it.
-		frame.setVisible(true);
-	}
-
+/** ========================================================================================= **/
+	
+	
+/** ======================================= ActionPerformed ================================== **/
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		// TODO Auto-generated method stub
 		System.out.println("============ In ActionPerfromed ============");
+		if ( e.getSource() == btnCLA ){
+			System.out.println("========== CLA Button is pressed ========== "); 
+			removeMainFrameButtons();		// Remove btnCLA and btnCTF from mainFrame
+			addTextFieldToMainFrameCLA();		// Insert a textField in mainFrame
+		} else if(e.getSource() == btnCTF){
+			System.out.println("========== CTF Button is pressed ========== ");
+			removeMainFrameButtons();		// Remove btnCLA and btnCTF from mainFrame
+			addTextFieldToMainFrameCTF();
+			
+		} else if(e.getSource() == btnQuit) {
+			System.out.println("========= Quit Button is pressed ==========");
+			System.exit(0);
+			
+		} else if(e.getSource() == btnReturn1){
+			System.out.println("========== Return Button CLA is pressed =======");
+			removeCLAFrame();
+			addMainFrameComponents();
+		} else if(e.getSource() == btnReturn2) {
+			System.out.println("========== Return Button CTF is pressed =======");
+			removeCTFFrame();
+			addMainFrameComponents();
+		} else {
+			
+		}
 		
+		
+		
+
 	}
+/** ========================================================================================= **/	
+	
+/** ========================== Functions called by actionPerformed ========================== **/
+	
+	private void removeCLAFrame() {
+		btnReturn1.setVisible(false);
+		txtFieldCLA.setVisible(false);
+	}
+	
+	private void removeCTFFrame() {
+		btnReturn2.setVisible(false);
+		txtFieldCTF.setVisible(false);
+	}
+	
+	private void addMainFrameComponents(){
+		btnCLA.setVisible(true);
+		btnCTF.setVisible(true);
+		btnQuit.setVisible(true);
+		
+		mainFrame.repaint();
+		mainFrame.validate();
+	}
+	
+
+	/**
+	 *	Method to remove the btnCLA and btnCTF from the mainFrame,
+	 *	called when new components are to be added.
+	 */
+	private void removeMainFrameButtons() {
+		btnCLA.setVisible(false);
+		btnCTF.setVisible(false);
+		btnQuit.setVisible(false);
+	}
+	
+	/**
+	 * Called when btnCLA is removed, and a textfield is to be added.
+	 */
+	private void addTextFieldToMainFrameCLA() {
+		// Add a textField, with a tooltip
+		txtFieldCLA = new JTextField(20);
+		txtFieldCLA.setToolTipText("Ange personnummer");
+		
+		// Creating a temporary return button
+		btnReturn1 = new JButton("Tillbaka");
+		
+		// Add action listener to the return button
+		btnReturn1.addActionListener(this);
+		
+		// Add the new changes to the mainFrame
+		mainFrame.add(txtFieldCLA);
+		mainFrame.add(btnReturn1);
+		mainFrame.repaint();
+		mainFrame.validate();
+	}
+	
+	/**
+	 * Called when btnCTF is removed, and a textfield is to be added.
+	 */
+	private void addTextFieldToMainFrameCTF() {
+		// Add a textField, with a tooltip
+		txtFieldCTF = new JTextField(20);
+		txtFieldCTF.setToolTipText("Ange kod");
+		
+		// Creating a temporary return button
+		btnReturn2 = new JButton("Tillbaka");
+		
+		// Add action listener to the return button
+		btnReturn2.addActionListener(this);
+		
+		// Add the new changes to the mainFrame
+		mainFrame.add(txtFieldCTF);
+		mainFrame.add(btnReturn2);
+		mainFrame.repaint();
+		mainFrame.validate();
+	}
+	
+/** ========================================================================================== **/	
 }
