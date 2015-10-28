@@ -69,6 +69,7 @@ public class VoterClient extends JFrame implements ActionListener{
 		btnCTF = new JButton("Rösta - CTF");
 		btnQuit = new JButton("Exit");
 		txtFieldDisplayCode = new JTextArea(5,20);
+		txtFieldDisplayCode.setEditable(false);
 		
 		//2. Optional: What happens when the frame closes?
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
