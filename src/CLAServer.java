@@ -1,11 +1,9 @@
 
-// An example class that uses the secure server socket class
-
 import java.io.*;
-import java.net.*;
+import java.math.BigInteger;
 import javax.net.ssl.*;
 import java.security.*;
-import java.util.StringTokenizer;
+import java.util.HashMap;
 
 public class CLAServer {
 	private int port;
@@ -17,22 +15,51 @@ public class CLAServer {
 	static final String keySTOREPASSWD = "123456";
 	static final String ALIASPASSWD = keySTOREPASSWD;
 	
-	String command = "";
-	String filename = "";
-	String voter = "";
-	StringBuilder filecontents = new StringBuilder("");
-	int filecontentsLength = -1;
+	// Inner class VoterPublicKey
+	public class VoterPublicKey {
+		private String ssn;
+		private BigInteger e, n;
+		
+		VoterPublicKey( BigInteger e, BigInteger n, String ssn){
+			this.ssn = ssn;
+			this.n = n;
+			this.e = e;
+		}
 
-	/** Constructor
-	 * @param port The port where the server
-	 *    will listen for requests
-	 */
-	CLAServer( int port ) {
-		this.port = port;
+		public BigInteger getE(){
+			return this.e;
+		}
+		public BigInteger getN(){
+			return this.n;
+		}
+		public String getSSN(){
+			return this.ssn;
+		}
 	}
 	
-	/** The method that does the work for the class */
-	public void run() {
+	// Hash map containing valid voter social security numbers and their corresponding public keys
+	HashMap<String, VoterPublicKey> voterPublicKeys;	// <ssn, voterPublicKey>
+	HashMap<String, String> voterValidationNumbers;		// <ssn, validationNumber>
+
+	/** Constructor
+	 * @param port The port where the server will listen for requests
+	 */
+	CLAServer( int port )
+	{
+		this.port = port;
+		
+		// Set up valid voters
+		voterPublicKeys = new HashMap<String, VoterPublicKey>();
+		voterPublicKeys.put("123", new VoterPublicKey(new BigInteger("17"), new BigInteger("551"), "123"));
+		voterPublicKeys.put("456", new VoterPublicKey(new BigInteger("7"), new BigInteger("253"), "456"));
+		voterPublicKeys.put("789", new VoterPublicKey(new BigInteger("5"), new BigInteger("119"), "789"));
+	}
+	
+	/**
+	 * Function run certifies/authenticates voter client, starts the server and processes SSN input
+	 */
+	public void run()
+	{
 		try {
 			KeyStore ks = KeyStore.getInstance( "JCEKS" );
 			ks.load( new FileInputStream( KEYSTORE ), keySTOREPASSWD.toCharArray() );
@@ -61,42 +88,35 @@ public class CLAServer {
 			BufferedReader in = new BufferedReader( new InputStreamReader( incoming.getInputStream() ) );
 			PrintWriter out = new PrintWriter( incoming.getOutputStream(), true );			
 			
-			// Command
-			String str;
-			while ( !(str = in.readLine()).equals("") )
+			// ===== Secure election ===== //
+			
+			voterPublicKeys = new HashMap<String, VoterPublicKey>();
+			
+			String ssn = in.readLine();
+			String validationNumber = "";
+			
+			// Check if the ssn is valid
+			if(voterPublicKeys.containsKey(ssn))
 			{
-				if(command.equals("")) {
-					command = str;
-				} else if(voter.equals("")) {
-					voter = str;
+				// check if a validation number already has been created for this ssn
+				if(voterValidationNumbers.containsKey(ssn))
+				{
+					// get the value of key 'ssn'
+					validationNumber = voterValidationNumbers.get(ssn);
+				} else {
+					// create a random validationNumber
+					validationNumber = generateValidationNumber();
+					voterValidationNumbers.put(ssn, validationNumber);
 				}
-//				if(command.equals(""))
-//				{
-//					command = str;
-//				} else if(filename.equals(""))
-//				{
-//					filename = str;
-//					if(command.equals("download")){
-//						download(filename, out);
-//						reset();
-//					}
-//					if(command.equals("delete")){
-//						delete(filename, out);
-//						reset();
-//					}
-//				} else if(filecontentsLength == -1) {
-//					// set the filecontentsLength
-//					filecontentsLength = Integer.parseInt(str);
-//					// for the StringBuilder fileContents, ensure that it is big enough
-//					filecontents.ensureCapacity(filecontentsLength);
-//				} else if(filecontentsLength > filecontents.length()){
-//					filecontents.append(str);
-//					if(filecontents.length() >= filecontentsLength && command.equals("upload")){
-//						upload(filename, filecontentsLength, filecontents, out);
-//						reset();
-//					}
-//				} 
+				
+				// Print the validation number back to the voter client
+				out.println(validationNumber);
+				
+			} else {
+				// Not a valid ssn
+				System.out.println("Not a valid ssn!");
 			}
+
 			incoming.close();
 		}
 		catch( Exception x ) {
@@ -105,64 +125,16 @@ public class CLAServer {
 		}
 	}
 	
-	private void reset(){
-		command = "";
-		filename = "";
-		filecontents.delete(0, filecontents.length());
-		filecontentsLength = -1;
-	}
-	
-	private void download(String filename, PrintWriter out)
-	{	
-		StringBuilder sb=new StringBuilder();
-		try (BufferedReader reader = new BufferedReader(new FileReader(filename)))
-		{
-			String line;
-			while((line=reader.readLine()) != null)
-			{
-				sb.append(line).append('\n');
-			}
-			sb.deleteCharAt(sb.length() - 1);
-			reader.close();
-		}
-		catch(FileNotFoundException exception)
-		{
-			out.println(exception.toString());
-		}
-		catch(IOException exception)
-		{
-			out.println(exception.toString());
-		}
-		
-		out.println(filename + " downloaded, contents: " + sb.toString());
-	}
-	
-	private void delete(String filename, PrintWriter out)
+	/*
+	 * Generate a random validation number.
+	 */
+	private String generateValidationNumber()
 	{
-		File file = new File(filename);
-		if(file.delete())
-		{
-			out.println(filename + " deleted.");
-		} else {
-			out.println("File not found.");
-		}
+		int randomInt = (int) Math.round( Math.random() ) * 20000;
+		return Integer.toString(randomInt);
 	}
 
-	private void upload(String filename, int fileLength, StringBuilder filecontents, PrintWriter out)
-	{
-		File file = new File(filename);
-		BufferedWriter writer;
-		try {
-			writer = new BufferedWriter(new FileWriter(file));
-			writer.write(filecontents.toString());
-			writer.close();
-		} catch (IOException e) {
-			out.println(e.toString());
-		}
-		out.println(filename + " uploaded");
-	}
-
-	/** The test method for the class
+	/** main method of class
 	 * @param args[0] Optional port number in place of
 	 *        the default
 	 */
