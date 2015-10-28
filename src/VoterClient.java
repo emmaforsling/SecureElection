@@ -42,6 +42,8 @@ public class VoterClient extends JFrame implements ActionListener{
 	 */
 	static VoterClient voterClient;
 
+	private String textFieldValue = "";
+	
 /** =============================== CONSTRUCTORS ============================================**/
 	/**
 	 * Default constructor, used to initiate the JFrame
@@ -94,7 +96,7 @@ public class VoterClient extends JFrame implements ActionListener{
 	
 /** =========================================== RUN ========================================= **/
   // The method used to start a client object
-	public void run() {
+	public void run(String ssn) {
 		try {
 			KeyStore ks = KeyStore.getInstance( "JCEKS" );
 			ks.load( new FileInputStream( KEYSTORE ), keySTOREPASSWD.toCharArray() );
@@ -123,6 +125,8 @@ public class VoterClient extends JFrame implements ActionListener{
 			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
 			System.out.println("Klienten skickar sitt personnummer till CLA");
+			socketOut.println(ssn);
+			System.out.println("Sending " + textFieldValue + " to server");
 //			String file_download = "a.txt";
 //			String file_upload = "new.txt";
 //			String file_delete = "delete.txt";
@@ -206,7 +210,6 @@ public class VoterClient extends JFrame implements ActionListener{
 			System.out.println("========== CLA Button is pressed ========== "); 
 			removeMainFrameButtons();		// Remove btnCLA and btnCTF from mainFrame
 			addTextFieldToMainFrameCLA();		// Insert a textField in mainFrame
-			voterClient.run();
 		} 
 		else if(e.getSource() == btnCTF){
 			System.out.println("========== CTF Button is pressed ========== ");
@@ -221,15 +224,16 @@ public class VoterClient extends JFrame implements ActionListener{
 		}
 		else if(e.getSource() == btnReturn1){
 			System.out.println("========== Return Button CLA is pressed =======");
-			String textFieldValue = txtFieldCLA.getText();
+			textFieldValue = txtFieldCLA.getText().toString();
 			System.out.println("Personnummer = " + textFieldValue);
 			removeCLAFrame();
 			addMainFrameComponents();
+			voterClient.run(textFieldValue);
 		}
 		else if(e.getSource() == btnReturn2) {
 			System.out.println("========== Return Button CTF is pressed =======");
-			String textFieldValue = txtFieldCTF.getText();
-			System.out.println("Kod = " + textFieldValue);
+			String textFieldValue2 = txtFieldCTF.getText();
+			System.out.println("Kod = " + textFieldValue2);
 			removeCTFFrame();
 			addMainFrameComponents();
 		} else {

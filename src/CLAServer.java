@@ -82,7 +82,7 @@ public class CLAServer {
 			// Client authentication
 			sss.setNeedClientAuth(true);
 			
-			System.out.println("\n>>>> SecureAdditionServer: active ");
+			System.out.println("\n>>>> CLA Server: active ");
 			SSLSocket incoming = (SSLSocket)sss.accept();
 
 			BufferedReader in = new BufferedReader( new InputStreamReader( incoming.getInputStream() ) );
@@ -93,6 +93,7 @@ public class CLAServer {
 			voterPublicKeys = new HashMap<String, VoterPublicKey>();
 			
 			String ssn = in.readLine();
+			System.out.println("Server read " + ssn + " from client");
 			String validationNumber = "";
 			
 			// Check if the ssn is valid
@@ -114,7 +115,7 @@ public class CLAServer {
 				
 			} else {
 				// Not a valid ssn
-				System.out.println("Not a valid ssn!");
+				System.out.println(ssn + " is not a valid ssn!");
 			}
 
 			incoming.close();
