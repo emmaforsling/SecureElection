@@ -132,7 +132,8 @@ public class VoterClient extends JFrame implements ActionListener{
 	private static void initJFrame() {
 		//1. Create the frame.
 		JFrame frame = new JFrame("FrameDemo");
-		JButton btn = new JButton("Få ditt röstkort från CLA");
+		JButton btnCLA = new JButton("Få ditt röstkort - CLA");
+		JButton btnCTF = new JButton("Rösta - CTF");
 		
 		//2. Optional: What happens when the frame closes?
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -143,7 +144,20 @@ public class VoterClient extends JFrame implements ActionListener{
 		frame.setLayout(new FlowLayout());
 		
 		// Add components
-		frame.add(btn);
+		frame.add(btnCLA);
+		frame.add(btnCTF);
+		
+		btnCLA.addActionListener(new ActionListener() { 
+			public void actionPerformed(ActionEvent e) { 
+				System.out.println("========== CLA Button is pressed ========== ");			  
+			} 
+		} );
+		
+		btnCTF.addActionListener(new ActionListener() { 
+			public void actionPerformed(ActionEvent e) { 
+				System.out.println("========== CTF Button is pressed ========== ");			  
+			} 
+		} );
 		
 		//4. Size the frame.
 		frame.pack();
