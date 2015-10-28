@@ -33,7 +33,7 @@ public class VoterClient extends JFrame implements ActionListener{
 	static private JButton btnReturn2;					// to return to the main screen
 	static private JTextField txtFieldCLA;				// to write the social security number in
 	static private JTextField txtFieldCTF;				// to write the code in
-	static private JTextField txtFieldDisplayCode; 		// displays the code
+	static private JTextArea txtFieldDisplayCode; 		// displays the code
 	/* */
 	/**
 	 * 
@@ -68,7 +68,7 @@ public class VoterClient extends JFrame implements ActionListener{
 		btnCLA = new JButton("Få ditt röstkort - CLA");
 		btnCTF = new JButton("Rösta - CTF");
 		btnQuit = new JButton("Exit");
-		txtFieldDisplayCode = new JTextField();
+		txtFieldDisplayCode = new JTextArea(5,20);
 		
 		//2. Optional: What happens when the frame closes?
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -97,6 +97,7 @@ public class VoterClient extends JFrame implements ActionListener{
 /** =========================================== RUN ========================================= **/
   // The method used to start a client object
 	public void run(String ssn) {
+		String validationCode = ""; 
 		try {
 			KeyStore ks = KeyStore.getInstance( "JCEKS" );
 			ks.load( new FileInputStream( KEYSTORE ), keySTOREPASSWD.toCharArray() );
@@ -127,11 +128,14 @@ public class VoterClient extends JFrame implements ActionListener{
 			System.out.println("Klienten skickar sitt personnummer till CLA");
 			socketOut.println(ssn);
 			System.out.println("Sending " + textFieldValue + " to server");
-			System.out.println( "Received validation number " + socketIn.readLine() + " from the server");
-//			String file_download = "a.txt";
-//			String file_upload = "new.txt";
-
-		    
+			
+			
+			validationCode = socketIn.readLine();
+			System.out.println( "Received validation number " + validationCode + " from the server");
+			if(!validationCode.equals("")){
+				txtFieldDisplayCode.setText(validationCode);
+			}
+			
 			// Stop loop on server
 			socketOut.println ( "" );
 		}
@@ -194,7 +198,10 @@ public class VoterClient extends JFrame implements ActionListener{
 			System.out.println("Personnummer = " + textFieldValue);
 			removeCLAFrame();
 			addMainFrameComponents();
+			
 			voterClient.run(textFieldValue);
+			
+			
 		}
 		else if(e.getSource() == btnReturn2) {
 			System.out.println("========== Return Button CTF is pressed =======");
