@@ -1,5 +1,6 @@
 // A client-side class that uses a secure TCP/IP socket
 
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,14 +28,27 @@ public class VoterClient extends JFrame implements ActionListener{
 	
 	/* JFrame components */ 
 	static private JFrame mainFrame;					
+	
 	static private JButton btnCLA;						// to activate the CLA screen
 	static private JButton btnCTF;						// to activate the CTF screen
 	static private JButton btnQuit;						// to quit the main screen
 	static private JButton btnReturn1;					// to return to the main screen
-	static private JButton btnReturn2;					// to return to the main screen
+	static private JButton btnReturn2;					// to run CTF and either activate "show results" or "vote" screen
+	static private JButton btnVoteParty1;				// to vote for party1
+	static private JButton btnVoteParty2;				// to vote for party2
+	static private JButton btnVoteParty3;				// to vote for party3
+	static private JButton backToMainMenu;				// to go back to main menu
+	
 	static private JTextField txtFieldCLA;				// to write the social security number in
 	static private JTextField txtFieldCTF;				// to write the code in
+	static private JTextField resultParty1;
+	static private JTextField resultParty2;
+	static private JTextField resultParty3;
+	
 	static private JTextArea txtFieldDisplayCode; 		// displays the code
+	
+	static private boolean noConnectionCLA = false;		// used to display if the CLA server is not connected
+	static private boolean noConnectionCTF = false;		// used to display if the CTF server is not connected
 	/* */
 	/**
 	 * 
@@ -52,7 +66,6 @@ public class VoterClient extends JFrame implements ActionListener{
 	public VoterClient(){
 		// Initialize mainFrame, consisting of two buttons, btnCLA and btnCTF
 		initJFrame();
-		
 	}
 
 	// Constructor @param host Internet address of the host where the server is located
@@ -139,9 +152,11 @@ public class VoterClient extends JFrame implements ActionListener{
 			
 			// Stop loop on server
 			socketOut.println ( "" );
+			noConnectionCLA = false;
 		}
 		catch( Exception x ) {
 			System.out.println( x );
+			noConnectionCLA = true;
 			x.printStackTrace();
 		}
 	}
@@ -180,10 +195,20 @@ public class VoterClient extends JFrame implements ActionListener{
 			socketOut.println(valCode);
 			System.out.println("Sending " + textFieldValue + " to server");
 			
+			boolean hasVoted = false;
+			if(!hasVoted){
+				createVoteForPartiesFrame();
+			} else {		// the voter has already voted
+				JOptionPane.showMessageDialog(null, "You've already voted or Invalid validation code");
+				displayVoteResults();
+			}
+			
 			// Stop loop on server
 			socketOut.println ( "" );
+			noConnectionCTF = false;
 		}
 		catch( Exception x ) {
+			noConnectionCTF = true;
 			System.out.println( x );
 			x.printStackTrace();
 		}
@@ -233,11 +258,17 @@ public class VoterClient extends JFrame implements ActionListener{
 				int CLAPort = DEFAULT_CLA_PORT;
 				
 				voterClient = new VoterClient( CLAHost, CLAPort );
+//				String[] args = new String[0];
+//				CLAServer.main(args);
+
 				voterClient.runCLA(textFieldValue);
 			}
 			catch ( UnknownHostException uhx ) {
 				System.out.println( uhx );
 				uhx.printStackTrace();
+			}
+			if(noConnectionCLA == true){
+				txtFieldDisplayCode.setText("Sorry, no connection was established.\nTry again Later.");
 			}
 			
 			//voterClient.run(textFieldValue);
@@ -247,7 +278,6 @@ public class VoterClient extends JFrame implements ActionListener{
 			String textFieldValue2 = txtFieldCTF.getText();
 			System.out.println("Kod = " + textFieldValue2);
 			removeCTFFrame();
-			addMainFrameComponents();
 			
 			// CTF host
 			try {
@@ -260,6 +290,16 @@ public class VoterClient extends JFrame implements ActionListener{
 				System.out.println( uhx );
 				uhx.printStackTrace();
 			}
+			if(noConnectionCTF == true){
+				addMainFrameComponents();
+				txtFieldDisplayCode.setText("Sorry, no connection was established.\nTry again Later.");
+			}
+			
+		} else if(e.getSource() == btnVoteParty1 || e.getSource() == btnVoteParty2 || e.getSource() == btnVoteParty3) {
+			displayVoteResults();
+		} else if(e.getSource() == backToMainMenu) {
+			removeVoteResults();
+			addMainFrameComponents();
 			
 		} else {
 			
@@ -269,25 +309,90 @@ public class VoterClient extends JFrame implements ActionListener{
 		
 
 	}
+
+
 /** ========================================================================================= **/	
 	
 /** ========================== Functions called by actionPerformed ========================== **/
 	
+	private void removeVoteResults() {
+		resultParty1.setVisible(false);
+		resultParty2.setVisible(false);
+		resultParty3.setVisible(false);
+		backToMainMenu.setVisible(false);
+	}
+	
+	private void displayVoteResults(){
+		btnVoteParty1.setVisible(false);
+		btnVoteParty2.setVisible(false);
+		btnVoteParty3.setVisible(false);
+		txtFieldDisplayCode.setVisible(false);
+		
+		resultParty1 = new JTextField(10);
+		resultParty2 = new JTextField(10);
+		resultParty3 = new JTextField(10);
+		
+		
+		resultParty1.setText("Resultat för Parti 1: 10");
+		resultParty2.setText("Resultat för Parti 2: 20");
+		resultParty3.setText("Resultat för Parti 3: 30");
+		
+		resultParty1.setEditable(false);
+		resultParty2.setEditable(false);
+		resultParty3.setEditable(false);
+		
+		backToMainMenu = new JButton("Return");
+		backToMainMenu.addActionListener(this);
+		
+		mainFrame.add(resultParty1);
+		mainFrame.add(resultParty2);
+		mainFrame.add(resultParty3);
+		mainFrame.add(backToMainMenu);
+	}
+	
+	private void createVoteForPartiesFrame() {
+		btnReturn2.setVisible(false);
+		txtFieldCTF.setVisible(false);
+		btnVoteParty1 = new JButton("Party 1");
+		btnVoteParty2 = new JButton("Party 2");
+		btnVoteParty3 = new JButton("Party 3");
+		
+		btnVoteParty1.setBackground(Color.RED);
+		btnVoteParty1.setOpaque(true);
+		btnVoteParty1.setBorderPainted(false);
+		btnVoteParty2.setBackground(Color.GREEN);
+		btnVoteParty2.setOpaque(true);
+		btnVoteParty2.setBorderPainted(false);
+		btnVoteParty3.setBackground(Color.cyan);
+		btnVoteParty3.setOpaque(true);
+		btnVoteParty3.setBorderPainted(false);
+		
+		btnVoteParty1.addActionListener(this);
+		btnVoteParty2.addActionListener(this);
+		btnVoteParty3.addActionListener(this);
+		
+		mainFrame.add(btnVoteParty1);
+		mainFrame.add(btnVoteParty2);
+		mainFrame.add(btnVoteParty3);
+	}
 	
 	private void removeCLAFrame() {
 		btnReturn1.setVisible(false);
 		txtFieldCLA.setVisible(false);
+		txtFieldDisplayCode.setVisible(false);
 	}
 	
 	private void removeCTFFrame() {
 		btnReturn2.setVisible(false);
 		txtFieldCTF.setVisible(false);
+		txtFieldDisplayCode.setVisible(false);
 	}
 	
 	private void addMainFrameComponents(){
 		btnCLA.setVisible(true);
 		btnCTF.setVisible(true);
 		btnQuit.setVisible(true);
+		txtFieldDisplayCode.setVisible(true);
 		
 		mainFrame.repaint();
 		mainFrame.validate();
