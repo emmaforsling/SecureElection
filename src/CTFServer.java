@@ -1,6 +1,8 @@
 
 import java.io.*;
 import java.math.BigInteger;
+import java.net.InetAddress;
+
 import javax.net.ssl.*;
 import java.security.*;
 import java.util.HashMap;
@@ -9,6 +11,7 @@ public class CTFServer {
 	private int port;
 	// This is not a reserved port number
 	static final int DEFAULT_PORT = 8189;
+	static final int DEFAULT_CLA_PORT = 8188;
 	static final String KEYSTORE = "LIUkeystore.ks";
 	static final String TRUSTSTORE = "LIUtruststore.ks";
 	static final String trustSTOREPASSWD = "abcdef";
@@ -59,16 +62,75 @@ public class CTFServer {
 			// ===== Secure election ===== //
 			
 			String valCode = in.readLine();
-			
-			// do stuff here
-			System.out.println("Received validation code " + valCode + " from the client");
+			System.out.println("CTF server received validation code " + valCode + " from the voter client");
 
+			// Check validation code against CLAServer
+			runCLA(valCode);
+		
 			incoming.close();
 		}
 		catch( Exception x ) {
 			System.out.println( x );
 			x.printStackTrace();
 		}
+	}
+
+	private void runCLA(String valCode)
+	{
+		try
+		{
+			System.out.println("Starting CLA server connection!");
+			
+			// Create connection
+			InetAddress CLAHost = InetAddress.getLocalHost();
+			int CLAPort = DEFAULT_CLA_PORT;
+			
+			KeyStore ks = KeyStore.getInstance( "JCEKS" );
+			ks.load( new FileInputStream( KEYSTORE ), keySTOREPASSWD.toCharArray() );
+			
+			KeyStore ts = KeyStore.getInstance( "JCEKS" );
+			ts.load( new FileInputStream( TRUSTSTORE ), trustSTOREPASSWD.toCharArray() );
+			
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance( "SunX509" );
+			kmf.init( ks, ALIASPASSWD.toCharArray() );
+			
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
+			tmf.init( ts );
+			
+			SSLContext sslContext = SSLContext.getInstance( "TLS" );
+			sslContext.init( kmf.getKeyManagers(), tmf.getTrustManagers(), null );
+			SSLSocketFactory sslFact = sslContext.getSocketFactory();      	
+			SSLSocket client =  (SSLSocket)sslFact.createSocket(CLAHost, CLAPort);
+			client.setEnabledCipherSuites( client.getSupportedCipherSuites() );
+			
+			System.out.println("\n>>>> CTF <-> CLA SSL/TLS handshake completed");
+			
+			BufferedReader socketIn;
+			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
+			PrintWriter socketOut = new PrintWriter( client.getOutputStream(), true );
+			
+			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+
+			// Send client name to CLA server
+			System.out.println("CTF server contacting CLA");
+			socketOut.println("CTFServer");
+			
+			// Send validation code to CLA server for validation
+			System.out.println("CTF sending valCode " + valCode + " to CLA!");
+			socketOut.println(valCode);
+			
+			// Read response from CLA server
+			String codeIsValid = socketIn.readLine();
+			System.out.println("CTF received codeIsValid = " + codeIsValid + " from CLA!");
+			
+			// Stop loop on server
+			socketOut.println ( "" );
+		}
+		catch( Exception x ) {
+			System.out.println( x );
+			x.printStackTrace();
+		}
+		
 	}
 
 	/** main method of class

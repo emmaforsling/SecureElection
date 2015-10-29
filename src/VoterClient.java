@@ -100,54 +100,7 @@ public class VoterClient extends JFrame implements ActionListener{
   // The method used to start a client object
 	public void runCLA(String ssn) {
 		String validationCode = ""; 
-		try {
-			KeyStore ks = KeyStore.getInstance( "JCEKS" );
-			ks.load( new FileInputStream( KEYSTORE ), keySTOREPASSWD.toCharArray() );
-			
-			KeyStore ts = KeyStore.getInstance( "JCEKS" );
-			ts.load( new FileInputStream( TRUSTSTORE ), trustSTOREPASSWD.toCharArray() );
-			
-			KeyManagerFactory kmf = KeyManagerFactory.getInstance( "SunX509" );
-			kmf.init( ks, ALIASPASSWD.toCharArray() );
-			
-			TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
-			tmf.init( ts );
-			
-			SSLContext sslContext = SSLContext.getInstance( "TLS" );
-			sslContext.init( kmf.getKeyManagers(), tmf.getTrustManagers(), null );
-			SSLSocketFactory sslFact = sslContext.getSocketFactory();      	
-			SSLSocket client =  (SSLSocket)sslFact.createSocket(host, port);
-			client.setEnabledCipherSuites( client.getSupportedCipherSuites() );
-			
-			System.out.println("\n>>>> SSL/TLS handshake completed");
-			
-			BufferedReader socketIn;
-			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
-			PrintWriter socketOut = new PrintWriter( client.getOutputStream(), true );
-			
-			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-
-			System.out.println("Klienten skickar sitt personnummer till CLA");
-			socketOut.println(ssn);
-			System.out.println("Sending " + textFieldValue + " to server");
-			
-			validationCode = socketIn.readLine();
-			System.out.println( "Received validation number " + validationCode + " from the server");
-			if(!validationCode.equals("")){
-				txtFieldDisplayCode.setText(validationCode);
-			}
-			
-			// Stop loop on server
-			socketOut.println ( "" );
-		}
-		catch( Exception x ) {
-			System.out.println( x );
-			x.printStackTrace();
-		}
-	}
-	
-	public void runCTF(String valCode)
-	{
+		
 		try
 		{
 			KeyStore ks = KeyStore.getInstance( "JCEKS" );
@@ -168,7 +121,7 @@ public class VoterClient extends JFrame implements ActionListener{
 			SSLSocket client =  (SSLSocket)sslFact.createSocket(host, port);
 			client.setEnabledCipherSuites( client.getSupportedCipherSuites() );
 			
-			System.out.println("\n>>>> SSL/TLS handshake completed");
+			System.out.println("\n>>>> Voter client <-> CLA SSL/TLS handshake completed");
 			
 			BufferedReader socketIn;
 			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
@@ -176,12 +129,60 @@ public class VoterClient extends JFrame implements ActionListener{
 			
 			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
-			System.out.println("Klienten skickar sitt personnummer till CLA");
-			socketOut.println(valCode);
-			System.out.println("Sending " + textFieldValue + " to server");
+			socketOut.println("VoterClient");
+			socketOut.println(ssn);
+			System.out.println("Voter client sending SSN " + ssn + " to CLA server");
+			
+			validationCode = socketIn.readLine();
+			System.out.println( "Voter client received validation number " + validationCode + " from the CLA server");
+			if(!validationCode.equals("")){
+				txtFieldDisplayCode.setText(validationCode);
+			}
 			
 			// Stop loop on server
 			socketOut.println ( "" );
+		}
+		catch( Exception x ) {
+			System.out.println( x );
+			x.printStackTrace();
+		}
+	}
+	
+	public void runCTF(String valCode)
+	{
+		try
+		{	
+			KeyStore ks = KeyStore.getInstance( "JCEKS" );
+			ks.load( new FileInputStream( KEYSTORE ), keySTOREPASSWD.toCharArray() );
+			
+			KeyStore ts = KeyStore.getInstance( "JCEKS" );
+			ts.load( new FileInputStream( TRUSTSTORE ), trustSTOREPASSWD.toCharArray() );
+			
+			KeyManagerFactory kmf = KeyManagerFactory.getInstance( "SunX509" );
+			kmf.init( ks, ALIASPASSWD.toCharArray() );
+			
+			TrustManagerFactory tmf = TrustManagerFactory.getInstance( "SunX509" );
+			tmf.init( ts );
+			
+			SSLContext sslContext = SSLContext.getInstance( "TLS" );
+			sslContext.init( kmf.getKeyManagers(), tmf.getTrustManagers(), null );
+			SSLSocketFactory sslFact = sslContext.getSocketFactory();      	
+			SSLSocket client =  (SSLSocket)sslFact.createSocket(host, port);
+			client.setEnabledCipherSuites( client.getSupportedCipherSuites() );
+			
+			System.out.println("\n>>>> Voter client <-> CTF SSL/TLS handshake completed");
+			
+			BufferedReader socketIn;
+			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
+			PrintWriter socketOut = new PrintWriter( client.getOutputStream(), true );
+			
+			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+
+			System.out.println("Voter client sending validation code " + valCode + " to CTF server");
+			socketOut.println(valCode);
+				
+			// Stop loop on server
+			// socketOut.println ( "" );
 		}
 		catch( Exception x ) {
 			System.out.println( x );
@@ -212,8 +213,7 @@ public class VoterClient extends JFrame implements ActionListener{
 		else if(e.getSource() == btnCTF){
 			System.out.println("========== CTF Button is pressed ========== ");
 			removeMainFrameButtons();		// Remove btnCLA and btnCTF from mainFrame
-			addTextFieldToMainFrameCTF();
-			
+			addTextFieldToMainFrameCTF();	
 		}
 		else if(e.getSource() == btnQuit) {
 			System.out.println("========= Quit Button is pressed ==========");
@@ -264,10 +264,6 @@ public class VoterClient extends JFrame implements ActionListener{
 		} else {
 			
 		}
-		
-		
-		
-
 	}
 /** ========================================================================================= **/	
 	
