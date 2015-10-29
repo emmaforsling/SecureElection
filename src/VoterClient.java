@@ -326,6 +326,7 @@ public class VoterClient extends JFrame implements ActionListener{
 		btnVoteParty1.setVisible(false);
 		btnVoteParty2.setVisible(false);
 		btnVoteParty3.setVisible(false);
+		txtFieldDisplayCode.setText("");
 		txtFieldDisplayCode.setVisible(false);
 		
 		resultParty1 = new JTextField(10);
