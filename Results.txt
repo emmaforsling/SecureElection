@@ -1,0 +1,1 @@
+{Party1=19, Party2=49, Party3=24}
