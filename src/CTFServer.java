@@ -1,8 +1,6 @@
 
 import java.io.*;
-import java.math.BigInteger;
 import java.net.InetAddress;
-
 import javax.net.ssl.*;
 import java.security.*;
 import java.util.HashMap;
@@ -18,6 +16,25 @@ public class CTFServer {
 	static final String keySTOREPASSWD = "123456";
 	static final String ALIASPASSWD = keySTOREPASSWD;
 
+	// Inner class VotingResult
+		public class VotingResult {
+			private String key;
+			private int result;
+			
+			VotingResult( int result, String key){
+				this.key = key;
+				this.result = result;
+			}
+
+			public int getResult(){
+				return this.result;
+			}
+			public String getKey(){
+				return this.key;
+			}
+		}
+	HashMap<String, Integer> VotingResults;	// <ssn, voterPublicKey>
+	
 	/** Constructor
 	 * @param port The port where the server will listen for requests
 	 */
@@ -62,6 +79,8 @@ public class CTFServer {
 			// ===== Secure election ===== //
 			
 			String valCode = in.readLine();
+			String chosenParty = "Party1";//in.readLine();
+			updateAndSaveResult(chosenParty);
 			System.out.println("CTF server received validation code " + valCode + " from the voter client");
 
 			// Check validation code against CLAServer
@@ -130,7 +149,77 @@ public class CTFServer {
 			System.out.println( x );
 			x.printStackTrace();
 		}
+	}
+
+	private void updateAndSaveResult(String chosenParty) {
+		// kalla på en funktion som läser in en fil med tidigare valresultat.
+		BufferedReader br;
+		String everything = "";
+		try {
+			br = new BufferedReader(new FileReader("Results.txt"));
+		    StringBuilder sb = new StringBuilder();
+		    String line = br.readLine();
+
+		    while (line != null) {
+		        sb.append(line);
+		        sb.append(System.lineSeparator());
+		        line = br.readLine();
+		    }
+		    everything = sb.toString();
+		    br.close();
+		} catch (IOException e) {
+			//out.println(e.toString());
+		}
 		
+		int resultParty1 = 0;
+		int resultParty2 = 0;
+		int resultParty3 = 0;
+		
+		String temp = everything.replace("{","");	//remove character {
+		temp = temp.replace("}","");				//remove character }
+		temp = temp.replaceAll("\\s","");			//removes white space
+		String[] temp2 = temp.split(",");			//split it
+		for(int i = 0; i<temp2.length;++i){
+			String[] tmp = temp2[i].split("=");		//split it again
+			if(tmp[0].equals("Party1")){
+				resultParty1 = Integer.parseInt(tmp[1]);
+			} else if(tmp[0].equals("Party2")){
+				resultParty2 = Integer.parseInt(tmp[1]);
+			} else if(tmp[0].equals("Party3")){
+				resultParty3 = Integer.parseInt(tmp[1]);
+			} else {
+				System.out.println("==="+ tmp[0] + "===");
+			}
+		}
+		if(chosenParty.equals("Party1")){
+			resultParty1++;
+		} else if(chosenParty.equals("Party2")){
+			resultParty2++;
+		} else if(chosenParty.equals("Party3")){
+			resultParty3++;
+		} else {
+			System.out.println("CTF, updateAndSaveResults - Choosen party is unkown");
+		}
+		VotingResults = new HashMap<String, Integer>();
+		VotingResults.put("Party1",resultParty1);
+		VotingResults.put("Party2",resultParty2);
+		VotingResults.put("Party3",resultParty3);
+		
+		// updatera denna med att öka på ett för valt parti
+		saveVotingResults(VotingResults);
+		
+	}
+
+	private void saveVotingResults(HashMap<String, Integer> votingResults2) {
+		File file = new File("Results.txt");
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(file));
+			writer.write(VotingResults.toString());
+			writer.close();
+		} catch (IOException e) {
+			
+		}
 	}
 
 	/** main method of class

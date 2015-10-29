@@ -1,9 +1,7 @@
 
 import java.io.*;
-import java.math.BigInteger;
 import javax.net.ssl.*;
 import java.security.*;
-import java.util.HashMap;
 
 public class CLAServer {
 	private int port;
@@ -88,7 +86,7 @@ public class CLAServer {
 			
 			System.out.println("\n>>>> CLA Server: active ");
 			SSLSocket incoming = null; //(SSLSocket)sss.accept();
-			
+
 			// Create a thread for each client connecting to this server
 			//SSLSocket socket = null;
 			while (true) {
@@ -108,15 +106,6 @@ public class CLAServer {
 		}
 	}
 	
-//	/*
-//	 * Generate a random validation number.
-//	 */
-//	private String generatevalidationCode()
-//	{
-//		int randomInt = (int) Math.round( Math.random() * 20000);
-//		return Integer.toString(randomInt);
-//	}
-
 	/** main method of class
 	 * @param args[0] Optional port number in place of the default
 	 */

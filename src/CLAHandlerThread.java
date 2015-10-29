@@ -1,7 +1,8 @@
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigInteger;
@@ -89,6 +90,8 @@ public class CLAHandlerThread extends Thread
 							validationCode = generatevalidationCode();
 							System.out.println("CLA adding ssn and validationCode " + ssn + ", " + validationCode + " to hash map!");
 							voterValidationCodes.put(ssn, validationCode);
+							// only used to show what is saved and to whom.
+							createASaveFile(voterValidationCodes);
 							
 							System.out.println("Result: " + voterValidationCodes.toString());
 						}
@@ -131,4 +134,18 @@ public class CLAHandlerThread extends Thread
 		int randomInt = (int) Math.round( Math.random() * 20000);
 		return Integer.toString(randomInt);
 	}
+	
+	private void createASaveFile(HashMap<String, String> voterValidationCodes2)
+	{
+		File file = new File("CLA_voters_and_codes.txt");
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(file));
+			writer.write(voterValidationCodes2.toString());
+			writer.close();
+		} catch (IOException e) {
+			
+		}	
+	}
+	
 }
