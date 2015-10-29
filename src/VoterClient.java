@@ -7,6 +7,8 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.*;
 import java.security.KeyStore;
+import java.util.ArrayList;
+
 import javax.net.ssl.*;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -41,14 +43,17 @@ public class VoterClient extends JFrame implements ActionListener{
 	
 	static private JTextField txtFieldCLA;				// to write the social security number in
 	static private JTextField txtFieldCTF;				// to write the code in
-	static private JTextField resultParty1;
-	static private JTextField resultParty2;
-	static private JTextField resultParty3;
+	
 	
 	static private JTextArea txtFieldDisplayCode; 		// displays the code
 	
 	static private boolean noConnectionCLA = false;		// used to display if the CLA server is not connected
 	static private boolean noConnectionCTF = false;		// used to display if the CTF server is not connected
+	static private int resultParty1;
+	static private int resultParty2;
+	static private int resultParty3;
+	
+	BarChart resultChart;
 	/* */
 	/**
 	 * 
@@ -58,6 +63,7 @@ public class VoterClient extends JFrame implements ActionListener{
 	static VoterClient voterClient;
 
 	private String textFieldValue = "";
+
 	
 /** =============================== CONSTRUCTORS ============================================**/
 	/**
@@ -195,8 +201,14 @@ public class VoterClient extends JFrame implements ActionListener{
 			socketOut.println(valCode);
 			System.out.println("Sending " + textFieldValue + " to server");
 			
-			boolean hasVoted = false;
+			boolean hasVoted = false;		// socketIn.readLine()
 			if(!hasVoted){
+				// nu röstar personen, skickar in partiet Party1, Party2, Party3 socketOut.println("Party1")
+				
+				// socketIn. få tillbaka det slutgiltiga resultatet med alla partierna
+				resultParty1 = 100;
+				resultParty2 = 8;
+				resultParty3 = 54;
 				createVoteForPartiesFrame();
 			} else {		// the voter has already voted
 				JOptionPane.showMessageDialog(null, "You've already voted or Invalid validation code");
@@ -316,9 +328,7 @@ public class VoterClient extends JFrame implements ActionListener{
 /** ========================== Functions called by actionPerformed ========================== **/
 	
 	private void removeVoteResults() {
-		resultParty1.setVisible(false);
-		resultParty2.setVisible(false);
-		resultParty3.setVisible(false);
+		resultChart.setVisible(false);
 		backToMainMenu.setVisible(false);
 	}
 	
@@ -329,25 +339,20 @@ public class VoterClient extends JFrame implements ActionListener{
 		txtFieldDisplayCode.setText("");
 		txtFieldDisplayCode.setVisible(false);
 		
-		resultParty1 = new JTextField(10);
-		resultParty2 = new JTextField(10);
-		resultParty3 = new JTextField(10);
+		resultChart = new BarChart();
+		resultChart.addBar(Color.red, resultParty1);
+		resultChart.addBar(Color.green, resultParty2);
+		resultChart.addBar(Color.cyan, resultParty3);		
+		mainFrame.add(resultChart);
+		mainFrame.setVisible(true);
+			
 		
 		
-		resultParty1.setText("Resultat för Parti 1: 10");
-		resultParty2.setText("Resultat för Parti 2: 20");
-		resultParty3.setText("Resultat för Parti 3: 30");
-		
-		resultParty1.setEditable(false);
-		resultParty2.setEditable(false);
-		resultParty3.setEditable(false);
 		
 		backToMainMenu = new JButton("Return");
 		backToMainMenu.addActionListener(this);
 		
-		mainFrame.add(resultParty1);
-		mainFrame.add(resultParty2);
-		mainFrame.add(resultParty3);
+
 		mainFrame.add(backToMainMenu);
 	}
 	
