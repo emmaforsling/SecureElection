@@ -60,9 +60,13 @@ public class CTFServer {
 			
 			String valCode = in.readLine();
 			
+			// Skapa connection med CLA Server för att kolla om valCode är giltig.
+			
 			// do stuff here
 			System.out.println("Received validation code " + valCode + " from the client");
 
+			// 
+			
 			incoming.close();
 		}
 		catch( Exception x ) {
