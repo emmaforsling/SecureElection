@@ -109,6 +109,9 @@ public class CLAServer {
 					// create a random validationCode
 					validationCode = generatevalidationCode();
 					voterValidationCodes.put(ssn, validationCode);
+					// only used to show what is saved and to whom.
+					createASaveFile(voterValidationCodes);
+					
 				}
 				
 				// Print the validation number back to the voter client
@@ -129,6 +132,20 @@ public class CLAServer {
 		}
 	}
 	
+	private void createASaveFile(HashMap<String, String> voterValidationCodes2) {
+		// TODO Auto-generated method stub
+		File file = new File("CLA_voters_and_codes.txt");
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(file));
+			writer.write(voterValidationCodes2.toString());
+			writer.close();
+		} catch (IOException e) {
+			
+		}
+		
+	}
+
 	/*
 	 * Generate a random validation number.
 	 */
