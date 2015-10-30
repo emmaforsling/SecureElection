@@ -195,13 +195,19 @@ public class VoterClient extends JFrame implements ActionListener
 			System.out.println("Voter client sending validation code " + valCode + " to CTF server");
 			socketOut.println(valCode);
 			
-			boolean hasVoted = Boolean.parseBoolean(socketIn.readLine());
-			if(hasVoted){
-				createVoteForPartiesFrame();
-			} else {		// the voter has already voted
-				JOptionPane.showMessageDialog(null, "You've already voted or Invalid validation code");
+			int voterCase = Integer.parseInt(socketIn.readLine());
+			if(voterCase == 0){
+				JOptionPane.showMessageDialog(null, "Invalid code!");
 				socketOut.println("IngetParti");
 				displayVoteResults();
+			} else if(voterCase == 1) {		// the voter has already voted
+				createVoteForPartiesFrame();
+			} else if(voterCase == 2) {
+				JOptionPane.showMessageDialog(null, "You have already voted!");
+				socketOut.println("IngetParti");
+				displayVoteResults();
+			} else {
+				System.out.println("RunCTF - här borde den fan inte gå in!");
 			}
 			
 			
@@ -352,13 +358,17 @@ private String getVotingResultsFromCTF()
 		resultChart.addBar(Color.red, resultParty1);
 		resultChart.addBar(Color.green, resultParty2);
 		resultChart.addBar(Color.cyan, resultParty3);		
+		
 		mainFrame.add(resultChart);
 		mainFrame.setVisible(true);
 			
 		backToMainMenu = new JButton("Return");
 		backToMainMenu.addActionListener(this);
-
 		mainFrame.add(backToMainMenu);
+		
+		mainFrame.repaint();
+		mainFrame.validate();
+		
 	}
 	
 	private void removeVotingButtons()

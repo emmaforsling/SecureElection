@@ -34,7 +34,7 @@ public class CTFHandlerThread extends Thread
 	private PrintWriter outVoter;
 	
 	static HashMap<String, Integer> VotingResults = new HashMap<String, Integer>();	// <ssn, voterPublicKey>
-	static HashMap<String, String> votesByCode = new HashMap<String, String>();		// <party, valCode>
+	static HashMap<String, String> votesByCode = new HashMap<String, String>();		// <valCode, party>
 	static String codeIsValid;
 	/**
 	 * Constructor
@@ -55,19 +55,29 @@ public class CTFHandlerThread extends Thread
 			System.out.println("CTF received valCode = " + valCode + " from voter client!");
 			
 			// Check validation code against CLAServer. TODO: check if voter already has voted
-			boolean temp_codeIsValid = validateCodeWithCLA(valCode);
-			outVoter.println(temp_codeIsValid);
-			if(temp_codeIsValid)
-			{
+			boolean temp_codeIsValid = validateCodeWithCLA(valCode);	
+			boolean alreadyVoted = votesByCode.containsKey(valCode);
+			
+			int voterCase = (temp_codeIsValid == true ? 1 : 0) + (alreadyVoted == true ? 1 : 0);
+			outVoter.println(voterCase);
+			
+			// If the code is valid and has not yet voted
+//			if(temp_codeIsValid && !alreadyVoted)
+//			{
 				String chosenParty = inVoter.readLine();
 				System.out.println("CTF received chosenParty = " + chosenParty + " from voter client!");
 				updateAndSaveResult(chosenParty);
+				if(temp_codeIsValid && !alreadyVoted)
+				{
+					votesByCode.put(valCode, chosenParty);
+				}
 				System.out.println("CTF server received validation code " + valCode + " from the voter client");
-			}
-			else{
-				String chosenParty = inVoter.readLine();
-				updateAndSaveResult(chosenParty);
-			}
+//			}
+//			else // send back the previous results
+//			{
+//				String chosenParty = inVoter.readLine();
+//				updateAndSaveResult(chosenParty);
+//			}
 			
 
 			outVoter.println(VotingResults.toString());
