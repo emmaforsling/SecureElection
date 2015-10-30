@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 public class VoterClient extends JFrame implements ActionListener{
 	private InetAddress host;
 	private int port;
+	private PrintWriter socketOut;
 	// This is not a reserved port number 
 	static final int DEFAULT_CLA_PORT = 8188;
 	static final int DEFAULT_CTF_PORT = 8189;
@@ -52,16 +53,8 @@ public class VoterClient extends JFrame implements ActionListener{
 	static private int resultParty3;
 	
 	BarChart resultChart;
-	/* */
-	/**
-	 * 
-	 * @param host
-	 * @param port
-	 */
 	static VoterClient voterClient;
-
 	private String textFieldValue = "";
-
 	
 /** =============================== CONSTRUCTORS ============================================**/
 	/**
@@ -142,7 +135,7 @@ public class VoterClient extends JFrame implements ActionListener{
 			
 			BufferedReader socketIn;
 			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
-			PrintWriter socketOut = new PrintWriter( client.getOutputStream(), true );
+			socketOut = new PrintWriter( client.getOutputStream(), true );
 			
 			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
@@ -193,13 +186,12 @@ public class VoterClient extends JFrame implements ActionListener{
 			
 			BufferedReader socketIn;
 			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
-			PrintWriter socketOut = new PrintWriter( client.getOutputStream(), true );
+			socketOut = new PrintWriter( client.getOutputStream(), true );
 			
 			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
 			System.out.println("Voter client sending validation code " + valCode + " to CTF server");
 			socketOut.println(valCode);
-			System.out.println("Sending " + textFieldValue + " to server");
 			
 			boolean hasVoted = false;		// socketIn.readLine()
 			if(!hasVoted){
@@ -216,7 +208,7 @@ public class VoterClient extends JFrame implements ActionListener{
 			}
 			
 			// Stop loop on server
-			socketOut.println ( "" );
+			// socketOut.println("");
 			noConnectionCTF = false;
 		}
 		catch( Exception x ) {
@@ -228,10 +220,13 @@ public class VoterClient extends JFrame implements ActionListener{
 /** ======================================================================================== **/	
 	
 /** ======================================== MAIN ========================================== **/	
-	// The test method for the class @param args Optional port number and host name
+	/**
+	 * main method of class
+	 * @param args Optional port number and host name
+	 * @param args
+	 */
 	public static void main( String[] args )
 	{
-		
 		VoterClient noClient = new VoterClient();
 	}
 /** ========================================================================================= **/
@@ -254,7 +249,6 @@ public class VoterClient extends JFrame implements ActionListener{
 		else if(e.getSource() == btnQuit) {
 			System.out.println("========= Quit Button is pressed ==========");
 			System.exit(0);
-			
 		}
 		else if(e.getSource() == btnReturn1){
 			System.out.println("========== Return Button CLA is pressed =======");
@@ -306,12 +300,18 @@ public class VoterClient extends JFrame implements ActionListener{
 				txtFieldDisplayCode.setText("Sorry, no connection was established.\nTry again Later.");
 			}
 			
-		} else if(e.getSource() == btnVoteParty1 || e.getSource() == btnVoteParty2 || e.getSource() == btnVoteParty3) {
+		} else if(e.getSource() == btnVoteParty1) {
+			socketOut.println("Party1");
+			displayVoteResults();
+		} else if(e.getSource() == btnVoteParty2) {
+			socketOut.println("Party2");
+			displayVoteResults();
+		} else if(e.getSource() == btnVoteParty3) {
+			socketOut.println("Party3");
 			displayVoteResults();
 		} else if(e.getSource() == backToMainMenu) {
 			removeVoteResults();
 			addMainFrameComponents();
-			
 		} else {
 			
 		}
