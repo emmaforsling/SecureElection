@@ -80,8 +80,8 @@ public class VoterClient extends JFrame implements ActionListener
 /** =========================== Initialize JFrame components ================================ **/
 	private void initJFrame() {
 		mainFrame = new JFrame("FrameDemo");
-		btnCLA = new JButton("Få ditt röstkort - CLA");
-		btnCTF = new JButton("Rösta - CTF");
+		btnCLA = new JButton("Get your voting code");
+		btnCTF = new JButton("Vote or check your vote");
 		btnQuit = new JButton("Exit");
 		txtFieldDisplayCode = new JTextArea(5,20);
 		txtFieldDisplayCode.setEditable(false);
@@ -203,7 +203,8 @@ public class VoterClient extends JFrame implements ActionListener
 			} else if(voterCase == 1) {		// the voter has already voted
 				createVoteForPartiesFrame();
 			} else if(voterCase == 2) {
-				JOptionPane.showMessageDialog(null, "You have already voted!");
+				String tmp = socketIn.readLine();
+				JOptionPane.showMessageDialog(null, "You have already voted! You voted for " + tmp);
 				socketOut.println("IngetParti");
 				displayVoteResults();
 			} else {
