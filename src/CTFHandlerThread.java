@@ -21,8 +21,8 @@ import javax.net.ssl.TrustManagerFactory;
 public class CTFHandlerThread extends Thread
 {
 	static final int DEFAULT_CLA_PORT = 8188;
-	static final String KEYSTORE = "LIUkeystore.ks";
-	static final String TRUSTSTORE = "LIUtruststore.ks";
+	static final String KEYSTORE = "authentication/LIUkeystore.ks";
+	static final String TRUSTSTORE = "authentication/LIUtruststore.ks";
 	static final String trustSTOREPASSWD = "abcdef";
 	static final String keySTOREPASSWD = "123456";
 	static final String ALIASPASSWD = keySTOREPASSWD;
