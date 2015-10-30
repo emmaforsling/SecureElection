@@ -1,1 +1,0 @@
-{Party1=29, Party2=50, Party3=25}
