@@ -61,16 +61,26 @@ public class CTFHandlerThread extends Thread
 			int voterCase = (temp_codeIsValid == true ? 1 : 0) + (alreadyVoted == true ? 1 : 0);
 			outVoter.println(voterCase);
 			
+			
 			// If the code is valid and has not yet voted
 //			if(temp_codeIsValid && !alreadyVoted)
 //			{
+			if(temp_codeIsValid && alreadyVoted){
+				String temp = votesByCode.get(valCode);
+				outVoter.println(temp);
+			}
 				String chosenParty = inVoter.readLine();
 				System.out.println("CTF received chosenParty = " + chosenParty + " from voter client!");
 				updateAndSaveResult(chosenParty);
+				// If the code is valid, but the voter already has voted, 
+				// show what that person voted on
+				
+				// If the code is valid, and the voter hasn't voted, store the chosenparty in votesByCode
 				if(temp_codeIsValid && !alreadyVoted)
 				{
 					votesByCode.put(valCode, chosenParty);
 				}
+				
 				System.out.println("CTF server received validation code " + valCode + " from the voter client");
 //			}
 //			else // send back the previous results
