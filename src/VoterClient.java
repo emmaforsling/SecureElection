@@ -11,6 +11,7 @@ import java.security.KeyStore;
 import javax.net.ssl.*;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -355,9 +356,19 @@ private String getVotingResultsFromCTF()
 		
 		// create the bar chart
 		resultChart = new BarChart();
-		resultChart.addBar(Color.red, resultParty1);
-		resultChart.addBar(Color.green, resultParty2);
-		resultChart.addBar(Color.cyan, resultParty3);		
+		resultChart.addBar(Color.red, resultParty1, "Party 1");
+		resultChart.addBar(Color.green, resultParty2, "Party 2");
+		resultChart.addBar(Color.cyan, resultParty3, "Party 3");
+		
+		mainFrame.add(new JLabel("<html>"
+				+ "Party 1 - " + resultParty1 + " votes<br>"
+				+ "Party 2 - " + resultParty2 + " votes<br>"
+				+ "Party 3 - " + resultParty3 + " votes"
+				+ "</html>"));
+		
+		//mainFrame.add(new JLabel("Party 1 - " + resultParty1 + " votes"));
+		//mainFrame.add(new JLabel("Party 2 - " + resultParty2 + " votes"));
+		//mainFrame.add(new JLabel("Party 3 - " + resultParty3 + " votes"));
 		
 		mainFrame.add(resultChart);
 		mainFrame.setVisible(true);

@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -24,10 +25,11 @@ public class BarChart extends JPanel
 	 * @param color color to display bar
 	 * @param value size of bar
 	 */
-	public void addBar(Color color, int value)
+	public void addBar(Color color, int value, String partyName)
 	{
 		bars.put(color, value);
 		repaint();
+		//this.add(new JLabel(partyName));
 	}
 	
 	@Override
