@@ -126,7 +126,7 @@ public class CTFHandlerThread extends Thread
 		BufferedReader br;
 		String everything = "";
 		try {
-			br = new BufferedReader(new FileReader("Results.txt"));
+			br = new BufferedReader(new FileReader("txt/Results.txt"));
 		    StringBuilder sb = new StringBuilder();
 		    String line = br.readLine();
 
@@ -181,7 +181,7 @@ public class CTFHandlerThread extends Thread
 	}
 
 	private void saveVotingResults(HashMap<String, Integer> votingResults2) {
-		File file = new File("Results.txt");
+		File file = new File("txt/Results.txt");
 		BufferedWriter writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(file));

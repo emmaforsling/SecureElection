@@ -137,7 +137,7 @@ public class CLAHandlerThread extends Thread
 	
 	private void createASaveFile(HashMap<String, String> voterValidationCodes2)
 	{
-		File file = new File("CLA_voters_and_codes.txt");
+		File file = new File("txt/CLA_voters_and_codes.txt");
 		BufferedWriter writer;
 		try {
 			writer = new BufferedWriter(new FileWriter(file));
