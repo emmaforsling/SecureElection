@@ -25,8 +25,8 @@ public class VoterClient extends JFrame implements ActionListener
 	// This is not a reserved port number 
 	static final int DEFAULT_CLA_PORT = 8188;
 	static final int DEFAULT_CTF_PORT = 8189;
-	static final String KEYSTORE = "PIERkeystore.ks";
-	static final String TRUSTSTORE = "PIERtruststore.ks";
+	static final String KEYSTORE = "authentication/PIERkeystore.ks";
+	static final String TRUSTSTORE = "authentication/PIERtruststore.ks";
 	static final String keySTOREPASSWD = "111111";
 	static final String trustSTOREPASSWD = "7777777";
 	static final String ALIASPASSWD = keySTOREPASSWD;
