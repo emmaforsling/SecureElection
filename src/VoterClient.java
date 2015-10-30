@@ -50,6 +50,8 @@ public class VoterClient extends JFrame implements ActionListener
 	
 	static private JTextArea txtFieldDisplayCode; 		// displays the code
 	
+	static private JLabel displayStats;					// displays the results next to the bar chart
+	
 	static private boolean noConnectionCLA = false;		// used to display if the CLA server is not connected
 	static private boolean noConnectionCTF = false;		// used to display if the CTF server is not connected
 	static private int resultParty1;
@@ -322,6 +324,7 @@ public class VoterClient extends JFrame implements ActionListener
 		} else if(e.getSource() == backToMainMenu) {
 			removeVoteResults();
 			addMainFrameComponents();
+			displayStats.setVisible(false);
 		} else {
 			
 		}
@@ -361,11 +364,13 @@ private String getVotingResultsFromCTF()
 		resultChart.addBar(Color.green, resultParty2, "Party 2");
 		resultChart.addBar(Color.cyan, resultParty3, "Party 3");
 		
-		mainFrame.add(new JLabel("<html>"
+		displayStats = new JLabel("<html>"
 				+ "Party 1 - " + resultParty1 + " votes<br>"
 				+ "Party 2 - " + resultParty2 + " votes<br>"
 				+ "Party 3 - " + resultParty3 + " votes"
-				+ "</html>"));
+				+ "</html>");
+		mainFrame.add(displayStats);
+		
 		
 		//mainFrame.add(new JLabel("Party 1 - " + resultParty1 + " votes"));
 		//mainFrame.add(new JLabel("Party 2 - " + resultParty2 + " votes"));
@@ -391,6 +396,7 @@ private String getVotingResultsFromCTF()
 		btnVoteParty3.setVisible(false);
 		txtFieldDisplayCode.setText("");
 		txtFieldDisplayCode.setVisible(false);
+		
 	}
 	
 	private void parseVotingResults()
