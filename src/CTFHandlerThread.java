@@ -7,7 +7,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.security.KeyStore;
@@ -48,12 +47,12 @@ public class CTFHandlerThread extends Thread
 		try
 		{
 			in = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
-			PrintWriter out = new PrintWriter( socket.getOutputStream(), true );			
-			
-			// ===== Secure election ===== //
+			PrintWriter out = new PrintWriter( socket.getOutputStream(), true );
 			
 			String valCode = in.readLine();
-			String chosenParty = "Party1";//in.readLine();
+			System.out.println("CTF received valCode = " + valCode + " from voter client!");
+			String chosenParty = in.readLine();
+			System.out.println("CTF received chosenParty = " + chosenParty + " from voter client!");
 			updateAndSaveResult(chosenParty);
 			System.out.println("CTF server received validation code " + valCode + " from the voter client");
 

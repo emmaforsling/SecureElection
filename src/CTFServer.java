@@ -1,9 +1,7 @@
 
 import java.io.*;
-import java.net.InetAddress;
 import javax.net.ssl.*;
 import java.security.*;
-import java.util.HashMap;
 
 public class CTFServer {
 	private int port;
@@ -15,24 +13,6 @@ public class CTFServer {
 	static final String trustSTOREPASSWD = "abcdef";
 	static final String keySTOREPASSWD = "123456";
 	static final String ALIASPASSWD = keySTOREPASSWD;
-
-//	// Inner class VotingResult
-//		public class VotingResult {
-//			private String key;
-//			private int result;
-//			
-//			VotingResult( int result, String key){
-//				this.key = key;
-//				this.result = result;
-//			}
-//
-//			public int getResult(){
-//				return this.result;
-//			}
-//			public String getKey(){
-//				return this.key;
-//			}
-//		}
 	
 	/** Constructor
 	 * @param port The port where the server will listen for requests
@@ -91,8 +71,7 @@ public class CTFServer {
 	}
 
 	/** main method of class
-	 * @param args[0] Optional port number in place of
-	 *        the default
+	 * @param args[0] Optional port number in place of the default
 	 */
 	public static void main( String[] args ) {
 		int port = DEFAULT_PORT;
