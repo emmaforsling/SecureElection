@@ -56,7 +56,7 @@ public class CTFHandlerThread extends Thread
 			updateAndSaveResult(chosenParty);
 			System.out.println("CTF server received validation code " + valCode + " from the voter client");
 
-			// Check validation code against CLAServer
+			// Check validation code against CLAServer. TODO: check if voter already has voted
 			runCLA(valCode);
 			socket.close();
 		} catch (IOException e) {
@@ -100,7 +100,7 @@ public class CTFHandlerThread extends Thread
 			
 			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 
-			// Send client name to CLA server
+			// Send own name to CLA server
 			System.out.println("CTF server contacting CLA");
 			socketOut.println("CTFServer");
 			
@@ -168,16 +168,16 @@ public class CTFHandlerThread extends Thread
 		} else if(chosenParty.equals("Party3")){
 			resultParty3++;
 		} else {
-			System.out.println("CTF, updateAndSaveResults - Choosen party is unkown");
+			System.out.println("CTF, updateAndSaveResults - Chosen party is unknown");
 		}
-		//VotingResults = new HashMap<String, Integer>();
-		VotingResults.put("Party1",resultParty1);
-		VotingResults.put("Party2",resultParty2);
-		VotingResults.put("Party3",resultParty3);
 		
-		// updatera denna med att öka på ett för valt parti
+		VotingResults.put("Party1", resultParty1);
+		VotingResults.put("Party2", resultParty2);
+		VotingResults.put("Party3", resultParty3);
+		
+		// uppdatera denna med att öka på med 1 för valt parti
+		// TODO: Store voter in order to check for 'already voted' and 'made vote'.
 		saveVotingResults(VotingResults);
-		
 	}
 
 	private void saveVotingResults(HashMap<String, Integer> votingResults2) {
