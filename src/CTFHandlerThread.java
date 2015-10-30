@@ -34,6 +34,7 @@ public class CTFHandlerThread extends Thread
 	private PrintWriter outVoter;
 	
 	static HashMap<String, Integer> VotingResults = new HashMap<String, Integer>();	// <ssn, voterPublicKey>
+	static HashMap<String, String> votesByCode = new HashMap<String, String>();		// <party, valCode>
 	static String codeIsValid;
 	/**
 	 * Constructor
@@ -52,13 +53,23 @@ public class CTFHandlerThread extends Thread
 			
 			String valCode = inVoter.readLine();
 			System.out.println("CTF received valCode = " + valCode + " from voter client!");
-			String chosenParty = inVoter.readLine();
-			System.out.println("CTF received chosenParty = " + chosenParty + " from voter client!");
-			updateAndSaveResult(chosenParty);
-			System.out.println("CTF server received validation code " + valCode + " from the voter client");
-
+			
 			// Check validation code against CLAServer. TODO: check if voter already has voted
-			runCLA(valCode);
+			boolean temp_codeIsValid = validateCodeWithCLA(valCode);
+			outVoter.println(temp_codeIsValid);
+			if(temp_codeIsValid)
+			{
+				String chosenParty = inVoter.readLine();
+				System.out.println("CTF received chosenParty = " + chosenParty + " from voter client!");
+				updateAndSaveResult(chosenParty);
+				System.out.println("CTF server received validation code " + valCode + " from the voter client");
+			}
+			else{
+				String chosenParty = inVoter.readLine();
+				updateAndSaveResult(chosenParty);
+			}
+			
+
 			outVoter.println(VotingResults.toString());
 			socket.close();
 		} catch (IOException e) {
@@ -66,7 +77,7 @@ public class CTFHandlerThread extends Thread
 		}
     }
     
-    private void runCLA(String valCode)
+    private boolean validateCodeWithCLA(String valCode)
 	{
 		try
 		{
@@ -110,13 +121,13 @@ public class CTFHandlerThread extends Thread
 			// Read response from CLA server
 			codeIsValid = inCLA.readLine();
 			System.out.println("CTF received codeIsValid = " + codeIsValid + " from CLA!");
-			
-			outCLA.println("hallå där!");
+			return Boolean.parseBoolean(codeIsValid);
 		}
 		catch( Exception x ) {
 			System.out.println( x );
 			x.printStackTrace();
 		}
+		return false;
 	}
     
     private void updateAndSaveResult(String chosenParty) {

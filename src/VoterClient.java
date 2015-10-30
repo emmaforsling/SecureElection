@@ -195,17 +195,15 @@ public class VoterClient extends JFrame implements ActionListener
 			System.out.println("Voter client sending validation code " + valCode + " to CTF server");
 			socketOut.println(valCode);
 			
-			boolean hasVoted = false;
-			if(!hasVoted){
-				// nu röstar personen, skickar in partiet Party1, Party2, Party3 socketOut.println("Party1")
-				
-				// få tillbaka det slutgiltiga resultatet med alla partierna				
-				
+			boolean hasVoted = Boolean.parseBoolean(socketIn.readLine());
+			if(hasVoted){
 				createVoteForPartiesFrame();
 			} else {		// the voter has already voted
 				JOptionPane.showMessageDialog(null, "You've already voted or Invalid validation code");
+				socketOut.println("IngetParti");
 				displayVoteResults();
 			}
+			
 			
 			noConnectionCTF = false;
 		}
@@ -297,18 +295,21 @@ public class VoterClient extends JFrame implements ActionListener
 				addMainFrameComponents();
 				txtFieldDisplayCode.setText("Sorry, no connection was established.\nTry again Later.");
 			}
-			
+						
 		} else if(e.getSource() == btnVoteParty1) {
 			socketOut.println("Party1");
 			votingResults = getVotingResultsFromCTF();
+			removeVotingButtons();
 			displayVoteResults();
 		} else if(e.getSource() == btnVoteParty2) {
 			socketOut.println("Party2");
 			votingResults = getVotingResultsFromCTF();
+			removeVotingButtons();
 			displayVoteResults();
 		} else if(e.getSource() == btnVoteParty3) {
 			socketOut.println("Party3");
 			votingResults = getVotingResultsFromCTF();
+			removeVotingButtons();
 			displayVoteResults();
 		} else if(e.getSource() == backToMainMenu) {
 			removeVoteResults();
@@ -341,14 +342,8 @@ private String getVotingResultsFromCTF()
 		backToMainMenu.setVisible(false);
 	}
 	
-	private void displayVoteResults(){
-		// hide previous elements
-		btnVoteParty1.setVisible(false);
-		btnVoteParty2.setVisible(false);
-		btnVoteParty3.setVisible(false);
-		txtFieldDisplayCode.setText("");
-		txtFieldDisplayCode.setVisible(false);
-		
+	private void displayVoteResults()
+	{
 		// Parse voting results and split string into integers
 		parseVotingResults();
 		
@@ -364,6 +359,16 @@ private String getVotingResultsFromCTF()
 		backToMainMenu.addActionListener(this);
 
 		mainFrame.add(backToMainMenu);
+	}
+	
+	private void removeVotingButtons()
+	{
+		// hide previous elements
+		btnVoteParty1.setVisible(false);
+		btnVoteParty2.setVisible(false);
+		btnVoteParty3.setVisible(false);
+		txtFieldDisplayCode.setText("");
+		txtFieldDisplayCode.setVisible(false);
 	}
 	
 	private void parseVotingResults()
