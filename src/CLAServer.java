@@ -12,32 +12,6 @@ public class CLAServer {
 	static final String trustSTOREPASSWD = "abcdef";
 	static final String keySTOREPASSWD = "123456";
 	static final String ALIASPASSWD = keySTOREPASSWD;
-	
-//	// Inner class VoterPublicKey
-//	public class VoterPublicKey {
-//		private String ssn;
-//		private BigInteger e, n;
-//		
-//		VoterPublicKey( BigInteger e, BigInteger n, String ssn){
-//			this.ssn = ssn;
-//			this.n = n;
-//			this.e = e;
-//		}
-//
-//		public BigInteger getE(){
-//			return this.e;
-//		}
-//		public BigInteger getN(){
-//			return this.n;
-//		}
-//		public String getSSN(){
-//			return this.ssn;
-//		}
-//	}
-	
-	// Hash map containing valid voter social security numbers and their corresponding public keys
-	//HashMap<String, VoterPublicKey> voterPublicKeys;	// <ssn, voterPublicKey>
-	//HashMap<String, String> voterValidationCodes;		// <ssn, validationCode>
 
 	/** Constructor
 	 * @param port The port where the server will listen for requests
@@ -45,15 +19,6 @@ public class CLAServer {
 	CLAServer( int port )
 	{
 		this.port = port;
-		
-//		// Set up valid voters
-//		voterPublicKeys = new HashMap<String, VoterPublicKey>();
-//		voterPublicKeys.put("123", new VoterPublicKey(new BigInteger("17"), new BigInteger("551"), "123"));
-//		voterPublicKeys.put("456", new VoterPublicKey(new BigInteger("7"), new BigInteger("253"), "456"));
-//		voterPublicKeys.put("789", new VoterPublicKey(new BigInteger("5"), new BigInteger("119"), "789"));
-//		
-//		// Set up validation keys
-//		voterValidationCodes = new HashMap<String, String>();
 	}
 	
 	/**
@@ -88,7 +53,6 @@ public class CLAServer {
 			SSLSocket incoming = null; //(SSLSocket)sss.accept();
 
 			// Create a thread for each client connecting to this server
-			//SSLSocket socket = null;
 			while (true) {
 				try {
 	                incoming = (SSLSocket)sss.accept();
