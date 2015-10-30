@@ -28,11 +28,13 @@ public class CTFHandlerThread extends Thread
 	static final String ALIASPASSWD = keySTOREPASSWD;
 	
 	protected Socket socket;
-	private BufferedReader in;
-	private PrintWriter out;
+	private BufferedReader inCLA;
+	private BufferedReader inVoter;
+	private PrintWriter outCLA;
+	private PrintWriter outVoter;
 	
 	static HashMap<String, Integer> VotingResults = new HashMap<String, Integer>();	// <ssn, voterPublicKey>
-	
+	static String codeIsValid;
 	/**
 	 * Constructor
 	 * @param clientSocket
@@ -43,21 +45,21 @@ public class CTFHandlerThread extends Thread
     
     public void run()
     {
-    	BufferedReader in;
 		try
 		{
-			in = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
-			PrintWriter out = new PrintWriter( socket.getOutputStream(), true );
+			inVoter = new BufferedReader( new InputStreamReader( socket.getInputStream() ) );
+			outVoter = new PrintWriter( socket.getOutputStream(), true );
 			
-			String valCode = in.readLine();
+			String valCode = inVoter.readLine();
 			System.out.println("CTF received valCode = " + valCode + " from voter client!");
-			String chosenParty = in.readLine();
+			String chosenParty = inVoter.readLine();
 			System.out.println("CTF received chosenParty = " + chosenParty + " from voter client!");
 			updateAndSaveResult(chosenParty);
 			System.out.println("CTF server received validation code " + valCode + " from the voter client");
 
 			// Check validation code against CLAServer. TODO: check if voter already has voted
 			runCLA(valCode);
+			outVoter.println(VotingResults.toString());
 			socket.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -94,26 +96,22 @@ public class CTFHandlerThread extends Thread
 			
 			System.out.println("\n>>>> CTF <-> CLA SSL/TLS handshake completed");
 			
-			BufferedReader socketIn;
-			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
-			PrintWriter socketOut = new PrintWriter( client.getOutputStream(), true );
-			
-			BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+			inCLA = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
+			outCLA = new PrintWriter( client.getOutputStream(), true );
 
 			// Send own name to CLA server
 			System.out.println("CTF server contacting CLA");
-			socketOut.println("CTFServer");
+			outCLA.println("CTFServer");
 			
 			// Send validation code to CLA server for validation
 			System.out.println("CTF sending valCode " + valCode + " to CLA!");
-			socketOut.println(valCode);
+			outCLA.println(valCode);
 			
 			// Read response from CLA server
-			String codeIsValid = socketIn.readLine();
+			codeIsValid = inCLA.readLine();
 			System.out.println("CTF received codeIsValid = " + codeIsValid + " from CLA!");
 			
-			// Stop loop on server
-			socketOut.println ( "" );
+			outCLA.println("hallå där!");
 		}
 		catch( Exception x ) {
 			System.out.println( x );
@@ -190,6 +188,5 @@ public class CTFHandlerThread extends Thread
 		} catch (IOException e) {
 			
 		}
-	}
-    
+	}    
 }

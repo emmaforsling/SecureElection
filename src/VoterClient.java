@@ -15,10 +15,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-public class VoterClient extends JFrame implements ActionListener{
+public class VoterClient extends JFrame implements ActionListener
+{
 	private InetAddress host;
 	private int port;
 	private PrintWriter socketOut;
+	private BufferedReader socketIn;
+	
 	// This is not a reserved port number 
 	static final int DEFAULT_CLA_PORT = 8188;
 	static final int DEFAULT_CTF_PORT = 8189;
@@ -53,6 +56,7 @@ public class VoterClient extends JFrame implements ActionListener{
 	static private int resultParty3;
 	
 	BarChart resultChart;
+	private static String votingResults;
 	static VoterClient voterClient;
 	private String textFieldValue = "";
 	
@@ -133,7 +137,6 @@ public class VoterClient extends JFrame implements ActionListener{
 			
 			System.out.println("\n>>>> Voter client <-> CLA SSL/TLS handshake completed");
 			
-			BufferedReader socketIn;
 			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
 			socketOut = new PrintWriter( client.getOutputStream(), true );
 			
@@ -184,7 +187,6 @@ public class VoterClient extends JFrame implements ActionListener{
 			
 			System.out.println("\n>>>> Voter client <-> CTF SSL/TLS handshake completed");
 			
-			BufferedReader socketIn;
 			socketIn = new BufferedReader( new InputStreamReader( client.getInputStream() ) );
 			socketOut = new PrintWriter( client.getOutputStream(), true );
 			
@@ -193,22 +195,18 @@ public class VoterClient extends JFrame implements ActionListener{
 			System.out.println("Voter client sending validation code " + valCode + " to CTF server");
 			socketOut.println(valCode);
 			
-			boolean hasVoted = false;		// socketIn.readLine()
+			boolean hasVoted = false;
 			if(!hasVoted){
 				// nu röstar personen, skickar in partiet Party1, Party2, Party3 socketOut.println("Party1")
 				
-				// socketIn. få tillbaka det slutgiltiga resultatet med alla partierna
-				resultParty1 = 100;
-				resultParty2 = 8;
-				resultParty3 = 54;
+				// få tillbaka det slutgiltiga resultatet med alla partierna				
+				
 				createVoteForPartiesFrame();
 			} else {		// the voter has already voted
 				JOptionPane.showMessageDialog(null, "You've already voted or Invalid validation code");
 				displayVoteResults();
 			}
 			
-			// Stop loop on server
-			// socketOut.println("");
 			noConnectionCTF = false;
 		}
 		catch( Exception x ) {
@@ -302,12 +300,15 @@ public class VoterClient extends JFrame implements ActionListener{
 			
 		} else if(e.getSource() == btnVoteParty1) {
 			socketOut.println("Party1");
+			votingResults = getVotingResultsFromCTF();
 			displayVoteResults();
 		} else if(e.getSource() == btnVoteParty2) {
 			socketOut.println("Party2");
+			votingResults = getVotingResultsFromCTF();
 			displayVoteResults();
 		} else if(e.getSource() == btnVoteParty3) {
 			socketOut.println("Party3");
+			votingResults = getVotingResultsFromCTF();
 			displayVoteResults();
 		} else if(e.getSource() == backToMainMenu) {
 			removeVoteResults();
@@ -319,6 +320,20 @@ public class VoterClient extends JFrame implements ActionListener{
 
 /** ========================================================================================= **/	
 	
+private String getVotingResultsFromCTF()
+{
+	String tempRes = null;
+	try {
+		tempRes = socketIn.readLine();
+		System.out.println("Voter received " + tempRes + " from CTF!");
+	} catch (IOException e1) {
+		// TODO Auto-generated catch block
+		e1.printStackTrace();
+	}
+	
+	return tempRes;
+}
+
 /** ========================== Functions called by actionPerformed ========================== **/
 	
 	private void removeVoteResults() {
@@ -327,12 +342,17 @@ public class VoterClient extends JFrame implements ActionListener{
 	}
 	
 	private void displayVoteResults(){
+		// hide previous elements
 		btnVoteParty1.setVisible(false);
 		btnVoteParty2.setVisible(false);
 		btnVoteParty3.setVisible(false);
 		txtFieldDisplayCode.setText("");
 		txtFieldDisplayCode.setVisible(false);
 		
+		// Parse voting results and split string into integers
+		parseVotingResults();
+		
+		// create the bar chart
 		resultChart = new BarChart();
 		resultChart.addBar(Color.red, resultParty1);
 		resultChart.addBar(Color.green, resultParty2);
@@ -344,6 +364,26 @@ public class VoterClient extends JFrame implements ActionListener{
 		backToMainMenu.addActionListener(this);
 
 		mainFrame.add(backToMainMenu);
+	}
+	
+	private void parseVotingResults()
+	{	
+		String temp = votingResults.replace("{","");	//remove character {
+		temp = temp.replace("}","");					//remove character }
+		temp = temp.replaceAll("\\s","");				//removes white space
+		String[] temp2 = temp.split(",");				//split it
+		for(int i = 0; i<temp2.length;++i){
+			String[] tmp = temp2[i].split("=");			//split it again
+			if(tmp[0].equals("Party1")){
+				resultParty1 = Integer.parseInt(tmp[1]);
+			} else if(tmp[0].equals("Party2")){
+				resultParty2 = Integer.parseInt(tmp[1]);
+			} else if(tmp[0].equals("Party3")){
+				resultParty3 = Integer.parseInt(tmp[1]);
+			} else {
+				System.out.println("==="+ tmp[0] + "===");
+			}
+		}
 	}
 	
 	private void createVoteForPartiesFrame() {
